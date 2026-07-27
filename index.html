@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<script>
+/* QUOTA-SAFE localStorage shim — предотвращает обрыв скриптов из-за QuotaExceededError.
+   Файл содержит десятки МБ base64; легаси-код пытается писать это в localStorage (лимит ~5МБ).
+   Без этого shim setItem бросает исключение и прерывает выполнение скрипта, из-за чего
+   функции открытия модалок не успевают определиться. */
+(function(){
+  try {
+    var ls = window.localStorage;
+    var origSet = ls.setItem.bind(ls);
+    ls.setItem = function(k, v){
+      try { return origSet(k, v); }
+      catch(e){ /* QuotaExceededError или иной — молча игнорируем, не прерываем скрипт */ return; }
+    };
+  } catch(e){
+    /* localStorage недоступен (приватный режим и т.п.) — подменяем заглушкой */
+    try {
+      var mem = {};
+      Object.defineProperty(window, 'localStorage', { value: {
+        getItem: function(k){ return k in mem ? mem[k] : null; },
+        setItem: function(k,v){ mem[k] = String(v); },
+        removeItem: function(k){ delete mem[k]; },
+        clear: function(){ mem = {}; },
+        key: function(i){ return Object.keys(mem)[i] || null; },
+        get length(){ return Object.keys(mem).length; }
+      }, configurable: true });
+    } catch(_){}
+  }
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Екатерина Попова — AI Creator & Specialist</title>
+<meta name="description" content="Портфолио Екатерины Поповой — AI Creator и специалист по искусственному интеллекту: реалистичные фото и видео, аватары, UGC, карточки для маркетплейсов, автоматизация на нейросетях.">
+<meta name="author" content="Екатерина Попова">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#FAF8F4">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Екатерина Попова — AI Creator & Specialist">
+<meta property="og:description" content="Реалистичные AI-фото и видео, аватары, UGC, карточки для маркетплейсов, автоматизация на нейросетях.">
+<meta property="og:url" content="__SITE_URL__/">
+<meta property="og:image" content="__SITE_URL__/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Екатерина Попова — AI Creator & Specialist">
+<meta name="twitter:description" content="Реалистичные AI-фото и видео, аватары, UGC, карточки для маркетплейсов, автоматизация на нейросетях.">
+<meta name="twitter:image" content="__SITE_URL__/og-image.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cr:#FAF8F4;--wm:#F4EFE8;--bl:#EDD5C8;--nu:#C9A898;--lv:#C4BAD6;--ll:#EDE9F5;--sg:#B5C0AE;--tx:#28201C;--md:#6B5750;--mt:#A89790;--br:rgba(180,140,125,0.16);--b2:rgba(180,140,125,0.28);--ac:#BF8E7E;--la:#9B8EB8;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{font-family:'Jost',sans-serif;background:var(--cr);color:var(--tx);font-weight:300;overflow-x:hidden;line-height:1.7;}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1rem 5vw;display:flex;align-items:center;justify-content:space-between;background:rgba(250,248,244,0.92);backdrop-filter:blur(14px);border-bottom:0.5px solid var(--br);}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;letter-spacing:.04em;color:var(--tx);}
+.logo span{color:var(--ac);}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--md);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:var(--ac);}
+.nav-tg{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;padding:.48rem 1.3rem;border:0.5px solid var(--nu);color:var(--md);text-decoration:none;border-radius:40px;transition:all .2s;}
+.nav-tg:hover{background:var(--bl);color:var(--tx);}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:8rem 5vw 5rem;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 65% 55% at 75% 38%,var(--ll) 0%,transparent 65%),radial-gradient(ellipse 45% 38% at 15% 78%,var(--bl) 0%,transparent 58%);pointer-events:none;}
+.hero-in{position:relative;max-width:800px;}
+.htag{display:inline-block;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--la);border:0.5px solid var(--lv);padding:.32rem .9rem;border-radius:40px;margin-bottom:1.6rem;}
+.hname{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,7vw,5.6rem);font-weight:300;line-height:1.03;margin-bottom:.6rem;}
+.hname em{font-style:italic;color:var(--ac);}
+.hsub{font-size:.98rem;color:var(--md);max-width:520px;margin-bottom:2.2rem;}
+.hpills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.8rem;}
+.hp{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.36rem .95rem;border-radius:40px;border:0.5px solid var(--b2);color:var(--md);}
+.hp.l{background:var(--ll);border-color:var(--lv);}
+.hp.b{background:#F5EAE5;border-color:var(--bl);}
+.hp.s{background:#EBF0E8;border-color:var(--sg);}
+.hbtns{display:flex;gap:.9rem;flex-wrap:wrap;}
+.btn-d{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;padding:.82rem 1.9rem;background:var(--tx);color:var(--cr);border-radius:40px;text-decoration:none;transition:background .2s;}
+.btn-d:hover{background:var(--md);}
+.btn-o{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;padding:.82rem 1.9rem;border:0.5px solid var(--b2);color:var(--md);border-radius:40px;text-decoration:none;transition:all .2s;}
+.btn-o:hover{border-color:var(--ac);color:var(--tx);}
+
+/* TOOLS STRIP */
+.tstrip{background:var(--wm);border-top:0.5px solid var(--br);border-bottom:0.5px solid var(--br);padding:1.2rem 5vw;overflow:hidden;}
+.tinner{display:flex;gap:2rem;align-items:center;flex-wrap:wrap;}
+.ti{display:flex;align-items:center;gap:.4rem;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--md);white-space:nowrap;}
+.td{width:4px;height:4px;border-radius:50%;background:var(--nu);flex-shrink:0;}
+
+/* SECTION */
+section{padding:6rem 5vw;}
+.sl{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mt);margin-bottom:.45rem;}
+.st{font-family:'Cormorant Garamond',serif;font-size:clamp(1.9rem,3.8vw,2.9rem);font-weight:300;line-height:1.15;margin-bottom:2.4rem;}
+.st em{font-style:italic;color:var(--ac);}
+
+/* FILTER */
+.fbar{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:2.4rem;}
+.fb{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.4rem 1rem;border-radius:40px;border:0.5px solid var(--b2);color:var(--md);background:transparent;cursor:pointer;transition:all .2s;font-family:'Jost',sans-serif;font-weight:300;}
+.fb:hover,.fb.on{background:var(--tx);color:var(--cr);border-color:var(--tx);}
+
+/* PORTFOLIO GRID */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:1.3rem;}
+.pc{background:#fff;border:0.5px solid var(--br);border-radius:16px;overflow:hidden;transition:transform .25s,box-shadow .25s;cursor:pointer;position:relative;z-index:1;}
+.pc:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(180,140,125,0.11);}
+.pc.wide{grid-column:span 2;}
+.cm{position:relative;overflow:hidden;background:var(--wm);}
+.cm img,.cm video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s;}
+.pc:hover .cm img,.pc:hover .cm video{transform:scale(1.04);}
+.cm.sq{aspect-ratio:1/1;}.cm.land{aspect-ratio:16/9;}.cm.port{aspect-ratio:3/4;max-height:400px;}
+.ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--mt);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;opacity:.4;}
+.cbadge{position:absolute;pointer-events:none;top:.8rem;left:.8rem;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;padding:.26rem .7rem;border-radius:40px;backdrop-filter:blur(8px);}
+.bv{background:rgba(200,192,216,0.88);color:#3D3060;}
+.bp{background:rgba(237,213,200,0.88);color:#7A4030;}
+.ba{background:rgba(181,192,174,0.88);color:#2D4025;}
+.cplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.cpbtn{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;}
+.cpbtn svg{width:15px;height:15px;fill:var(--tx);margin-left:3px;}
+.cbody{padding:1rem 1.2rem 1.3rem;}
+.cn{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--mt);margin-bottom:.25rem;}
+.ct{font-family:'Cormorant Garamond',serif;font-size:1.18rem;font-weight:400;line-height:1.22;margin-bottom:.4rem;}
+.cd{font-size:.78rem;color:var(--md);line-height:1.6;}
+.ctags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.7rem;}
+.tg{font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;padding:.18rem .55rem;border-radius:20px;background:var(--wm);color:var(--mt);border:0.5px solid var(--br);}
+.cdel{position:absolute;top:.8rem;right:.8rem;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.85);border:0.5px solid var(--b2);cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;color:var(--mt);opacity:0;transition:opacity .2s;}
+.pc:hover .cdel{opacity:1;}
+.cdel{display:none!important;}/* публичная версия: без кнопок удаления */
+#emptyState{text-align:center;padding:4rem 0;color:var(--mt);display:none;}
+
+/* OLIVIA CARD special */
+.ol-hero{position:relative;overflow:hidden;cursor:pointer;}
+.ol-hero img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;transition:transform .35s;}
+.pc:hover .ol-hero img{transform:scale(1.04);}
+.ol-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(28,20,18,0.52) 0%,transparent 55%);}
+.ol-text{position:absolute;bottom:1.1rem;left:1.1rem;right:3.5rem;}
+.ol-name{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:#fff;line-height:1;}
+.ol-sub{font-size:.65rem;color:rgba(255,255,255,0.65);letter-spacing:.08em;text-transform:uppercase;margin-top:.25rem;}
+.ol-play{position:absolute;bottom:1rem;right:1rem;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.15);border:0.5px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;}
+.ol-play svg{width:13px;height:13px;fill:#fff;margin-left:2px;}
+
+/* ADD FORM */
+#add-section{background:var(--wm);border-top:0.5px solid var(--br);}
+.aform{max-width:640px;}
+.fr{margin-bottom:1.1rem;}
+.fr label{display:block;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--md);margin-bottom:.38rem;}
+.fr input,.fr select,.fr textarea{width:100%;padding:.7rem .95rem;background:#fff;border:0.5px solid var(--b2);border-radius:10px;font-family:'Jost',sans-serif;font-size:.87rem;color:var(--tx);font-weight:300;outline:none;transition:border-color .2s;}
+.fr input:focus,.fr select:focus,.fr textarea:focus{border-color:var(--nu);}
+.fr textarea{resize:vertical;min-height:76px;}
+.fr select{appearance:none;cursor:pointer;}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;}
+.dz{border:0.5px dashed var(--b2);border-radius:12px;padding:1.8rem;text-align:center;cursor:pointer;transition:all .2s;background:#fff;}
+.dz:hover,.dz.over{border-color:var(--ac);background:var(--ll);}
+.dz p{font-size:.74rem;color:var(--mt);}
+.dzi{font-size:1.5rem;opacity:.3;margin-bottom:.4rem;}
+.abtn{font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;padding:.8rem 2rem;background:var(--tx);color:var(--cr);border:none;border-radius:40px;cursor:pointer;font-family:'Jost',sans-serif;font-weight:300;transition:background .2s;margin-top:.4rem;}
+.abtn:hover{background:var(--md);}
+.pstrip{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.7rem;}
+.pthumb{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:0.5px solid var(--b2);}
+.pthumb img,.pthumb video{width:100%;height:100%;object-fit:cover;}
+.pthumb .rm{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+
+/* CASES */
+#cases{background:var(--ll);}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.3rem;}
+.cc{background:#fff;border:0.5px solid var(--br);border-radius:16px;padding:1.7rem 1.9rem;transition:transform .2s;}
+.cc:hover{transform:translateY(-3px);}
+.cnum{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;color:var(--bl);line-height:1;margin-bottom:.65rem;}
+.ctitle{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:400;margin-bottom:.55rem;line-height:1.22;}
+.cdesc2{font-size:.8rem;color:var(--md);line-height:1.65;}
+.cres{margin-top:.85rem;padding-top:.85rem;border-top:0.5px solid var(--br);font-size:.74rem;color:var(--mt);}
+.cres strong{color:var(--tx);font-weight:400;}
+
+/* ABOUT */
+.about-g{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;}
+.about-p{font-size:.9rem;color:var(--md);margin-bottom:.85rem;line-height:1.8;}
+.expl{list-style:none;margin-top:1.4rem;}
+.exi{display:grid;grid-template-columns:78px 1fr;gap:.9rem;padding:.85rem 0;border-bottom:0.5px solid var(--br);}
+.exd{font-size:.68rem;color:var(--mt);padding-top:.12rem;}
+.exr{font-size:.84rem;font-weight:400;}
+.exc{font-size:.74rem;color:var(--md);margin-top:.1rem;}
+.sw{display:flex;flex-direction:column;gap:1.6rem;}
+.sgt{font-size:.63rem;letter-spacing:.18em;text-transform:uppercase;color:var(--mt);margin-bottom:.65rem;}
+.sgp{display:flex;flex-wrap:wrap;gap:.38rem;}
+.sgpi{font-size:.72rem;padding:.3rem .82rem;border-radius:20px;border:0.5px solid var(--b2);color:var(--md);}
+
+/* CONTACT */
+#contact{background:var(--tx);color:var(--cr);}
+#contact .sl{color:var(--mt);}
+#contact .st{color:var(--cr);}
+#contact .st em{color:var(--bl);}
+.cong{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
+.conp{font-size:.9rem;color:rgba(250,248,244,.56);line-height:1.8;margin-bottom:1.8rem;}
+.tglink{display:inline-flex;align-items:center;gap:.7rem;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--cr);text-decoration:none;padding:.85rem 1.7rem;border:0.5px solid rgba(255,255,255,0.2);border-radius:40px;transition:all .2s;}
+.tglink:hover{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.35);}
+.tglink svg{width:16px;height:16px;fill:currentColor;flex-shrink:0;}
+.coni{display:flex;flex-direction:column;gap:1.3rem;}
+.conil{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mt);}
+.coniv{font-size:.88rem;color:rgba(250,248,244,.73);}
+
+footer{background:var(--tx);border-top:0.5px solid rgba(255,255,255,0.06);padding:1.3rem 5vw;display:flex;justify-content:space-between;align-items:center;}
+footer p{font-size:.68rem;color:var(--mt);letter-spacing:.06em;}
+
+/* MODAL */
+.mov{position:fixed;inset:0;background:rgba(28,20,18,0.74);z-index:500;display:none;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(5px);}
+.mov.open{display:flex;}
+.mbox{background:var(--cr);border-radius:20px;max-width:740px;width:100%;max-height:90vh;overflow-y:auto;}
+.mcb{display:flex;justify-content:flex-end;padding:.9rem .9rem .3rem;position:sticky;top:0;background:var(--cr);border-radius:20px 20px 0 0;}
+.mcb button{width:28px;height:28px;border-radius:50%;border:0.5px solid var(--b2);background:transparent;cursor:pointer;font-size:.85rem;color:var(--md);}
+.mmw{overflow:hidden;}
+.mmw img,.mmw video{width:100%;max-height:80vh;object-fit:contain;background:#1a1410;}
+.mbw{padding:1.7rem 2rem 2.2rem;}
+.mn{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--mt);margin-bottom:.3rem;}
+.mt2{font-family:'Cormorant Garamond',serif;font-size:1.85rem;font-weight:300;margin-bottom:.8rem;line-height:1.2;}
+.md2{font-size:.86rem;color:var(--md);line-height:1.75;}
+
+/* OLIVIA MODAL */
+.omov{position:fixed;inset:0;background:rgba(28,20,18,0.82);z-index:600;display:none;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(6px);}
+.omov.open{display:flex;}
+.ombox{background:var(--cr);border-radius:20px;max-width:1100px;width:100%;max-height:95vh;overflow-y:auto;}
+
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--tx);color:var(--cr);padding:.7rem 1.3rem;border-radius:40px;font-size:.76rem;letter-spacing:.05em;z-index:700;opacity:0;transform:translateY(8px);transition:all .28s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+@media(max-width:768px){
+  .nav-links{display:none;}nav{padding:1rem 4vw;}
+  .hero{padding:6.5rem 4vw 3.5rem;}
+  section{padding:4rem 4vw;}
+  .pgrid{grid-template-columns:1fr;}
+  .pc.wide{grid-column:span 1;}
+  .cgrid,.about-g,.cong,.f2{grid-template-columns:1fr;gap:1.2rem;}
+  .about-g{gap:2.5rem;}.cong{gap:2rem;}
+  .ol-name{font-size:1.4rem;}
+  #olGrid{grid-template-columns:repeat(2,1fr)!important;} 
+  .om-inner{grid-template-columns:1fr!important;}
+}
+
+
+img { -webkit-user-select: none; user-select: none; }
+video { -webkit-user-select: none; user-select: none; }
+/* Block download drag on media only */
+.cm img, .card-media img { pointer-events: none; }
+/* VIEWER MODE - no editing */
+.cdel { display: none !important; }
+.abtn { display: none !important; }
+#add-section { display: none !important; }
+
+
+/* ── Viewer mode ── */
+.cdel { display: none !important; }
+#add-section { display: none !important; }
+img { -webkit-user-select: none; user-select: none; }
+
+/* ── Experience / Education layout ── */
+.expl-new { display:flex; flex-direction:column; gap:1.4rem; }
+.exp-item { display:grid; grid-template-columns:130px 1fr; gap:.8rem 1.4rem; }
+.exp-period { font-size:.7rem; color:var(--mt); letter-spacing:.06em; line-height:1.5; padding-top:.15rem; }
+.exp-role { font-size:.92rem; font-weight:600; color:var(--dk); margin-bottom:.1rem; }
+.exp-company { font-size:.78rem; color:var(--ac); margin-bottom:.3rem; }
+.exp-note { font-size:.72rem; color:var(--mt); font-style:italic; }
+.exp-list { margin:.3rem 0 0 1rem; padding:0; list-style:disc; }
+.exp-list li { font-size:.78rem; color:var(--md); line-height:1.65; margin-bottom:.2rem; }
+@media(max-width:768px){
+  .exp-item { grid-template-columns:1fr; gap:.2rem; }
+  .exp-period { font-size:.68rem; color:var(--ac); }
+}
+
+/* ── МОБИЛЬНАЯ АДАПТАЦИЯ: модалки, медиа, сетка ── */
+@media(max-width:640px){
+  /* Модалки на весь экран */
+  .omov, .mov { padding:0 !important; align-items:flex-start !important; }
+  .ombox, .mbox { max-width:100% !important; width:100% !important; max-height:100vh !important; min-height:100vh; border-radius:0 !important; }
+  /* Медиа в групповой модалке — комфортная высота под телефон */
+  #grpMainWrap { max-height:62vh !important; min-height:220px !important; }
+  #grpMainImg, #grpMainVid { max-height:62vh !important; }
+  /* Стрелки чуть меньше и ближе к краю */
+  #grpPrev, #grpNext { width:38px !important; height:38px !important; }
+  /* Превью-миниатюры компактнее */
+  #grpThumbs > div { width:60px !important; height:60px !important; }
+  #grpThumbs { max-height:140px !important; }
+  /* Заголовок модалки */
+  #grpTitle { font-size:1.05rem !important; }
+  /* Не-групповая модалка (#modal) — медиа на телефон */
+  .mmw img, .mmw video { max-height:62vh !important; }
+  /* Модалка Оливии */
+  #olMainImg { max-height:62vh !important; }
+  .om-inner { grid-template-columns:1fr !important; gap:1rem !important; }
+  /* Карточки портфолио — одна колонка, удобный размер */
+  .pgrid { grid-template-columns:1fr !important; gap:1rem !important; }
+  /* Сетка миниатюр Оливии */
+  #olGrid { grid-template-columns:repeat(3,1fr) !important; }
+  /* Тулзы-лента в hero — перенос */
+  .hero h1, #heroName { font-size:2.4rem !important; }
+  /* Кейсы и блоки в одну колонку */
+  .cgrid, .about-g, .cong, .f2, .sw { grid-template-columns:1fr !important; }
+  /* Кнопки в hero — на всю ширину */
+  .hero-cta { flex-wrap:wrap; }
+}
+@media(max-width:640px) and (orientation:landscape){
+  /* В альбомной ориентации даём больше места медиа */
+  #grpMainWrap, #grpMainImg, #grpMainVid { max-height:82vh !important; }
+}
+
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Екатерина <span>Попова</span></div>
+  <ul class="nav-links">
+    <li><a href="#portfolio">Портфолио</a></li>
+    <li><a href="#cases">Кейсы</a></li>
+    <li><a href="#about">Обо мне</a></li>
+    <li><a href="#contact">Контакт</a></li>
+  </ul>
+  <a href="https://t.me/ddddonskaya" target="_blank" class="nav-tg">Telegram</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-in">
+    <div class="htag">AI Creator &amp; Specialist · Казань · Удалённо</div>
+    <h1 class="hname">Екатерина<br><em>Попова</em></h1>
+    <p class="hsub">Создаю AI-контент и строю интеллектуальные системы — от фото и видео с нейросетями до ботов, автоматизации и обучающих продуктов для бизнеса.</p>
+    <div class="hpills">
+      <span class="hp l">AI-видео &amp; Reels</span>
+      <span class="hp b">Фото &amp; рендеры</span>
+      <span class="hp s">Аватары &amp; UGC</span>
+      <span class="hp l">Prompt Engineering</span>
+      <span class="hp b">Маркетплейсы</span>
+      <span class="hp s">Автоматизация</span>
+    </div>
+    <div class="hbtns">
+      <a href="#portfolio" class="btn-d">Смотреть работы</a>
+      <a href="https://t.me/ddddonskaya" target="_blank" class="btn-o">Написать в Telegram</a>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<div class="tstrip">
+  <div class="tinner">
+    <div class="ti"><div class="td"></div>NanoBanana</div>
+    <div class="ti"><div class="td"></div>Kling</div>
+    <div class="ti"><div class="td"></div>Seedream</div>
+    <div class="ti"><div class="td"></div>Seedance</div>
+    <div class="ti"><div class="td"></div>Magnific</div>
+    <div class="ti"><div class="td"></div>Midjourney</div>
+    <div class="ti"><div class="td"></div>Flux</div>
+    <div class="ti"><div class="td"></div>GPT Image</div>
+    <div class="ti"><div class="td"></div>Runway</div>
+    <div class="ti"><div class="td"></div>Luma / Veo</div>
+    <div class="ti"><div class="td"></div>HeyGen</div>
+    <div class="ti"><div class="td"></div>ElevenLabs</div>
+    <div class="ti"><div class="td"></div>Make.com</div>
+    <div class="ti"><div class="td"></div>Claude / GPT-4o</div>
+    <div class="ti"><div class="td"></div>Gemini + NotebookLM</div>
+  </div>
+</div>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="sl">Избранные работы</div>
+  <h2 class="st">Портфолио — <em>визуальный контент</em></h2>
+  <div class="fbar">
+    <button class="fb on" data-f="all">Все работы</button>
+    <button class="fb" data-f="video">Видео</button>
+    <button class="fb" data-f="photo">Фото</button>
+    <button class="fb" data-f="fashion">Мода &amp; Ювелирка</button>
+    <button class="fb" data-f="beauty">Бьюти</button>
+    <button class="fb" data-f="marketplace">Маркетплейсы &amp; Нейродизайн</button>
+    <button class="fb" data-f="food">Еда</button>
+  </div>
+  <div class="pgrid" id="pGrid"></div>
+  <div id="emptyState"><p style="font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;opacity:.4;">Работы появятся после добавления</p></div>
+</section>
+
+<!-- ADD hidden -->
+<section id="add-section" style="display:none">
+  <div class="sl">Управление</div>
+  <h2 class="st">Добавить <em>работу</em></h2>
+  <div style="width:36px;height:0.5px;background:var(--nu);margin:.7rem 0 2.2rem;"></div>
+  <div class="aform">
+    <div class="f2">
+      <div class="fr"><label>Название *</label><input type="text" id="fi-title" placeholder="Аватар для beauty-бренда"></div>
+      <div class="fr"><label>Ниша</label>
+        <select id="fi-niche">
+          <option value="jewelry">Ювелирка</option>
+          <option value="beauty">Бьюти / косметика</option>
+          <option value="fashion">Мода / одежда</option>
+          <option value="marketplace">Маркетплейсы</option>
+          <option value="avatar">Аватары / UGC</option>
+          <option value="corporate">Корпоратив</option>
+          <option value="video">Видео / Reels</option>
+          <option value="photo">Фото / рендер</option>
+        </select>
+      </div>
+    </div>
+    <div class="f2">
+      <div class="fr"><label>Тип</label>
+        <select id="fi-type">
+          <option value="photo">Фото / рендер</option>
+          <option value="video">Видео / Reels</option>
+          <option value="avatar">Аватар</option>
+        </select>
+      </div>
+      <div class="fr"><label>Инструменты (через запятую)</label><input type="text" id="fi-tools" placeholder="Midjourney, Runway"></div>
+    </div>
+    <div class="fr"><label>Описание</label><textarea id="fi-desc" placeholder="Задача, что сделано, результат..."></textarea></div>
+    <div class="fr">
+      <label>Медиафайл</label>
+      <div class="dz" id="dz">
+        <div class="dzi">↑</div>
+        <p>Перетащите или нажмите для выбора</p>
+        <p style="font-size:.64rem;opacity:.5;margin-top:.3rem;">JPG · PNG · MP4 · MOV — до 200 МБ</p>
+        <input type="file" id="fi-file" accept="image/*,video/*" style="display:none">
+      </div>
+      <div class="pstrip" id="pstrip"></div>
+    </div>
+    <button class="abtn" onclick="addWork()">Добавить в портфолио</button>
+  </div>
+</section>
+
+<!-- CASES -->
+<section id="cases">
+  <div class="sl">Реальные проекты</div>
+  <h2 class="st">Кейсы из <em>практики</em></h2>
+  <div class="cgrid">
+    <div class="cc"><div class="cnum">01</div><div class="ctitle">Чат-бот в Bitrix24 на Perplexity API</div><div class="cdesc2">Спроектировала логику и методику ответов. Реализовала чат-бот внутри Bitrix24 — бот по API обращается к Perplexity и возвращает структурированные ответы строго по методике компании.</div><div class="cres"><strong>Результат:</strong> рабочий инструмент внутри привычной среды — единообразные, предсказуемые ответы без ручного поиска.</div></div>
+
+    <div class="cc"><div class="cnum">02</div><div class="ctitle">Аналитика Wildberries + МойСклад — дашборд и автообновление</div><div class="cdesc2">Система соединяет два источника: WB (продажи, заказы, возвраты, остатки) и МойСклад (карточки, приходы, склад). Автоматическое ночное обновление ~03:00 МСК, ручной маппинг товаров WB↔МС. Листы: Дашборд, Оборачиваемость (FIFO), Топ продаж, Дефицит, Возвраты, Партии.</div><div class="cres"><strong>Результат:</strong> единая аналитика без ручного копирования — данные по выручке, запасам и оборачиваемости всегда актуальны.</div></div>
+
+    <div class="cc"><div class="cnum">03</div><div class="ctitle">Логистический дашборд S&amp;OP: out-of-stock / overstock</div><div class="cdesc2">Проект дашборда для процесса S&amp;OP с показателями дефицита и излишков. Система рассчитывает риски по каждой позиции и формирует управленческие рекомендации — когда скорректировать закупки, перераспределить запасы или пересмотреть план спроса. Цель: раннее выявление рисков до того, как они влияют на продажи.</div><div class="cres"><strong>Результат:</strong> повышение точности управления запасами, сокращение ситуаций дефицита и затоваривания.</div></div>
+
+    <div class="cc"><div class="cnum">04</div><div class="ctitle">ИИ-аватары и видео-персонажи для контента</div><div class="cdesc2">Создала 6 разных ИИ-аватаров — реалистичных и мультяшных. Полный цикл: концепция → генерация → голос (ElevenLabs / HeyGen) → тест. Еженедельные ИИ-новости для TG-канала с аватаром-спикером, снятым один раз.</div><div class="cres"><strong>Результат:</strong> живой контент каждую неделю без съёмок и без найма актёра.</div></div>
+
+    <div class="cc"><div class="cnum">05</div><div class="ctitle">AI-персоны и ассистенты для разных ролей</div><div class="cdesc2">Узкие ассистенты под конкретные задачи: юрист, JTBD-аналитик, тренажёр возражений для продавцов, помощник по техдокументам (Gemini + NotebookLM). Для каждого — системный промпт, структура диалога, сценарии и примеры.</div><div class="cres"><strong>Результат:</strong> сокращение рутины у юристов, маркетологов, продавцов и техписателей.</div></div>
+
+    <div class="cc"><div class="cnum">06</div><div class="ctitle">Внутренняя LMS с ИИ-ассистентом (Битрикс24)</div><div class="cdesc2">С нуля спроектировала и реализовала обучающую платформу через вайбкодинг. Интегрирована локальным приложением в Битрикс24: курсы, тесты, роли — внутри корпоративного портала. ИИ-ассистент объясняет темы, задаёт вопросы, отрабатывает навыки в диалоге. Пилот с реальными пользователями.</div><div class="cres"><strong>Результат:</strong> LMS встроена в привычную среду — сотрудники обучаются без смены приложения.</div></div>
+
+    <div class="cc"><div class="cnum">07</div><div class="ctitle">Обучающие курсы с ИИ: PDF, презентации, видео, тесты</div><div class="cdesc2">Разрабатываю обучающие материалы на разные темы с использованием ИИ-инструментов: структурированные PDF-гайды, презентации, объяснительные видео, тесты и практические задания. Часть курсов адаптирована под международную аудиторию — с локализацией на другие языки и рынки.</div><div class="cres"><strong>Результат:</strong> готовые к внедрению учебные продукты, которые можно масштабировать без привлечения методистов.</div></div>
+
+    <div class="cc"><div class="cnum">08</div><div class="ctitle">ИИ-агент для службы поддержки на базе знаний</div><div class="cdesc2">Задача: создать и внедрить ИИ-агента, который сократит время поиска информации сотрудниками поддержки за счёт структурированной базы знаний. Агент обрабатывает обращения, находит релевантные ответы и формирует готовые реплики. Целевой показатель точности — не менее 90%.</div><div class="cres"><strong>Результат:</strong> сокращение времени обработки обращений, снижение нагрузки на опытных сотрудников.</div></div>
+
+    <div class="cc"><div class="cnum">09</div><div class="ctitle">Тренажёр продаж — ИИ-симулятор клиента (вайбкодинг)</div><div class="cdesc2">Собрала на вайбкодинге веб-приложение для тренировки менеджеров: два режима на одном сайте — розница и интернет-магазин. Внутри база знаний, прописанные сценарии диалогов и рандомизация реплик и тем, чтобы каждая сессия была разной. ИИ-агент играет роль клиента: задаёт вопросы, отрабатывает возражения, ведёт диалог — а в конце выставляет менеджеру оценку по разговору.</div><div class="cres"><strong>Результат:</strong> розница + интернет-магазин на одном сайте, разные сценарии и автоматическая оценка диалога — тренировка без участия живого тренера.</div></div>
+
+    <div class="cc"><div class="cnum">10</div><div class="ctitle">Личный AI-агент для hh.ru + Telegram-бот</div><div class="cdesc2">Сделала персонального агента под hh.ru: просматривает подходящие вакансии, откликается и отвечает на вопросы в анкетах работодателей. Управление и уведомления — через связку с Telegram-ботом, чтобы держать весь процесс под контролем прямо из мессенджера.</div><div class="cres"><strong>Результат:</strong> авто-отклики и заполнение анкет на hh.ru с управлением через Telegram-бота — экономия часов ручной рутины.</div></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="sl">О специалисте</div>
+  <h2 class="st">Немного <em>обо мне</em></h2>
+  <div class="about-g">
+    <div>
+      <p class="about-p">Работаю на стыке AI-контента и автоматизации: создаю реалистичные фото, видео и аватары с нейросетями — и строю ИИ-системы, которые экономят время команд.</p>
+      <p class="about-p">За почти три года — опыт в промпт-инжиниринге, разметке данных для обучения моделей, разработке ботов, дашбордов, LMS и AI-персон. Помогаю формулировать задачи под ИИ и доводить их до результата. Английский B2.</p>
+
+      <!-- Опыт работы -->
+      <div style="margin-top:2rem;">
+        <div class="sl" style="margin-bottom:1.2rem;">Опыт работы</div>
+        <div class="expl-new">
+
+          <div class="exp-item">
+            <div class="exp-period">Окт 2025 — сейчас</div>
+            <div class="exp-body">
+              <div class="exp-role">Специалист по искусственному интеллекту</div>
+              <div class="exp-company">Конфиденциально (NDA)</div>
+              <ul class="exp-list">
+                <li>Автоматизация рутинных процессов: работа с документами, аналитика текстов, маркетинговые задачи</li>
+                <li>Генерация контента с нейросетями: фото, видео, аватары, карточки товаров, обучающие материалы</li>
+                <li>Проектирование и настройка многошаговых связок с LLM под разные задачи: ускорение процессов, аналитика, генерация контента, работа с документами, обогащение данных — через Make.com, n8n, Apify и API моделей</li>
+                <li>Разработка AI-персон, тренажёров продаж, чат-ботов и ассистентов</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="exp-item">
+            <div class="exp-period">Сент 2024 — Май 2025</div>
+            <div class="exp-body">
+              <div class="exp-role">Промпт-инженер</div>
+              <div class="exp-company">Синергия</div>
+              <ul class="exp-list">
+                <li>Разработка и оптимизация промптов для текста, фото и видео под задачи маркетинга</li>
+                <li>Тестирование, анализ качества ответов ИИ, улучшение системных инструкций</li>
+                <li>Настройка параметров генеративных моделей, формирование библиотек шаблонов</li>
+                <li>Создание обучающих курсов в различных форматах (PDF, презентации, видео, тесты) на разные темы, в том числе с локализацией на другие языки и рынки</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="exp-item">
+            <div class="exp-period">Июль 2023 — Март 2024</div>
+            <div class="exp-body">
+              <div class="exp-role">Специалист разметки данных и качества поиска</div>
+              <div class="exp-company">Яндекс Крауд</div>
+              <ul class="exp-list">
+                <li>Разметка изображений, аудио, текстов для обучения моделей поиска</li>
+                <li>Проверка, исправление и классификация ответов YaGPT, фактчекинг</li>
+                <li>Оценка релевантности и ранжирования внутренних сервисов поиска</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Образование -->
+      <div style="margin-top:2rem;">
+        <div class="sl" style="margin-bottom:1.2rem;">Образование</div>
+        <div class="expl-new">
+
+          <div class="exp-item">
+            <div class="exp-period">2025 — сейчас</div>
+            <div class="exp-body">
+              <div class="exp-role">Университет искусственного интеллекта</div>
+              <div class="exp-company">Вайбкодинг · ИИ-агенты · AI-продукты</div>
+              <div class="exp-note">Продолжаю обучение</div>
+            </div>
+          </div>
+
+          <div class="exp-item">
+            <div class="exp-period">2021 — 2025</div>
+            <div class="exp-body">
+              <div class="exp-role">Казанский федеральный университет</div>
+              <div class="exp-company">КФУ, Казань · Высшее образование</div>
+              <div class="exp-note">Высшее образование</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    <div class="sw">
+      <div><div class="sgt">Генерация фото и видео</div><div class="sgp"><span class="sgpi">Grok</span><span class="sgpi">Recraft</span><span class="sgpi">Gemini Omni</span><span class="sgpi">GPT Image</span><span class="sgpi">NanoBanana</span><span class="sgpi">Flux</span><span class="sgpi">Seedream</span><span class="sgpi">Kling</span><span class="sgpi">Seedance</span><span class="sgpi">Runway</span><span class="sgpi">Luma</span><span class="sgpi">Veo / Sora</span><span class="sgpi">Magnific</span><span class="sgpi">Midjourney</span><span class="sgpi">Stable Diffusion</span></div></div>
+      <div><div class="sgt">Аватары и голос</div><div class="sgp"><span class="sgpi">HeyGen</span><span class="sgpi">D-ID</span><span class="sgpi">ElevenLabs</span></div></div>
+      <div><div class="sgt">AI и автоматизация</div><div class="sgp"><span class="sgpi">Claude</span><span class="sgpi">GPT-4o</span><span class="sgpi">Gemini</span><span class="sgpi">Perplexity</span><span class="sgpi">Make.com</span><span class="sgpi">n8n</span><span class="sgpi">Apify</span><span class="sgpi">NotebookLM</span></div></div>
+      <div><div class="sgt">Направления</div><div class="sgp"><span class="sgpi">Prompt Engineering</span><span class="sgpi">UGC-контент</span><span class="sgpi">Маркетплейсы</span><span class="sgpi">AI-аватары</span><span class="sgpi">Автоматизация</span><span class="sgpi">Обучение</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="cong">
+    <div>
+      <div class="sl">Контакт</div>
+      <h2 class="st">Давайте<br><em>работать</em> вместе</h2>
+      <p class="conp">Открыта для проектной работы, парт-тайма и полной занятости удалённо. Нужен AI-контент, автоматизация или нейросетевой инструмент — пишите.</p>
+      <a href="https://t.me/ddddonskaya" target="_blank" class="tglink">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+        @ddddonskaya
+      </a>
+    </div>
+    <div class="coni">
+      <div><div class="conil">Telegram</div><div class="coniv">@ddddonskaya</div></div>
+      <div><div class="conil">Email</div><div class="coniv">ekat.don.03@gmail.com</div></div>
+      <div><div class="conil">Локация</div><div class="coniv">Казань · удалённо</div></div>
+      <div><div class="conil">Формат</div><div class="coniv">Полная / частичная / проект</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Екатерина Попова — AI Creator &amp; Specialist</p>
+  <p>@ddddonskaya</p>
+</footer>
+
+
+<!-- GROUP LIGHTBOX MODAL -->
+<div class="omov" id="grpModal" onclick="maybeCloseGrp(event)">
+  <div class="ombox" id="grpBox">
+    <!-- header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:.8rem 1.2rem;position:sticky;top:0;background:var(--cr);border-radius:20px 20px 0 0;z-index:2;border-bottom:0.5px solid var(--b2);">
+      <div>
+        <div id="grpNiche" style="font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mt);margin-bottom:.15rem;"></div>
+        <div id="grpTitle" style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;color:var(--dk);line-height:1.2;"></div>
+      </div>
+      <button onclick="closeGrpModal()" style="width:32px;height:32px;border-radius:50%;border:0.5px solid var(--b2);background:transparent;cursor:pointer;font-size:.95rem;color:var(--md);flex-shrink:0;">✕</button>
+    </div>
+
+    <!-- main media area -->
+    <div style="position:relative;background:#111;min-height:320px;max-height:80vh;display:flex;align-items:center;justify-content:center;overflow:hidden;" id="grpMainWrap">
+      <img id="grpMainImg" src="" style="max-width:100%;max-height:80vh;width:auto;height:auto;object-fit:contain;display:block;user-select:none;">
+      <video id="grpMainVid" src="" controls playsinline webkit-playsinline controlsList="nodownload" oncontextmenu="return false;" style="max-width:100%;max-height:80vh;width:auto;height:auto;object-fit:contain;display:none;background:#000;"></video>
+      <!-- nav arrows -->
+      <button onclick="grpNav(-1)" id="grpPrev" style="position:absolute;left:.8rem;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:none;background:rgba(250,248,244,0.9);cursor:pointer;font-size:1.3rem;color:#333;box-shadow:0 2px 8px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;">‹</button>
+      <button onclick="grpNav(1)" id="grpNext" style="position:absolute;right:.8rem;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:none;background:rgba(250,248,244,0.9);cursor:pointer;font-size:1.3rem;color:#333;box-shadow:0 2px 8px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;">›</button>
+    </div>
+
+    <!-- label + counter -->
+    <div style="padding:.6rem 1.2rem .2rem;display:flex;justify-content:space-between;align-items:center;">
+      <div id="grpItemLabel" style="font-size:.8rem;color:var(--md);"></div>
+      <div id="grpCounter" style="font-size:.68rem;letter-spacing:.1em;color:var(--mt);"></div>
+    </div>
+
+    <!-- description -->
+    <div style="padding:.3rem 1.2rem .8rem;">
+      <p id="grpDesc" style="font-size:.78rem;color:var(--mt);line-height:1.6;margin:0;"></p>
+    </div>
+
+    <!-- thumbnails strip -->
+    <div style="padding:.5rem 1.2rem 1.4rem;">
+      <div style="font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--mt);margin-bottom:.5rem;">Все материалы</div>
+      <div id="grpThumbs" style="display:flex;flex-wrap:wrap;gap:.5rem;max-height:160px;overflow-y:auto;"></div>
+    </div>
+  </div>
+
+
+<script>
+const GROUPS={"beauty_splash": {"title": "Beauty — Splash-shot сыворотки", "niche": "beauty", "type": "photo", "desc": "Гиперреалистичные product-shots: флаконы сывороток врезаются в воду. Замороженные брызги, преломление света в каплях. Задача — передать свежесть и эффективность продукта через динамику воды.", "cover_idx": 0, "items": []}, "beauty_portrait": {"title": "Beauty — Портреты с продуктом", "niche": "beauty", "type": "photo", "desc": "Коммерческие beauty-портреты: модели с продуктом в руке, естественная кожа без избыточного ретуша. Разные форматы — close-up макро, лайфстайл в ванной, editorial-стиль.", "cover_idx": 0, "items": [{"label": "Close-up: нанесение туши Hourglass", "src": "assets/08bbc003aad7.jpg", "type": "photo"}, {"label": "Candid: Shik Glow Mist на пляже, закат", "src": "assets/74e45e93fa8d.jpg", "type": "photo"}, {"label": "UGC-стиль: Vois крем в ванной, селфи", "src": "assets/6e42e42bde8b.jpg", "type": "photo"}, {"label": "UGC-стиль: нанесение крема, зеркало", "src": "assets/021fd344e24c.jpg", "type": "photo"}, {"label": "High-fashion: Gisou масло для волос — модель в шёлковом халате", "src": "assets/1fc5599c4a98.jpg", "type": "photo"}, {"label": "Макро: крем на коже — видны поры, пушок, текстура", "src": "data:dup,0", "type": "photo"}, {"label": "Editorial: тинт Luxvisage — портрет с продуктом", "src": "assets/6c676ec031c7.jpg", "type": "photo"}]}, "beauty_flatlay": {"title": "Beauty — Предметные съёмки и splash", "niche": "beauty", "type": "photo", "desc": "Предметная съёмка и splash-shot: флаконы сывороток в воде (Likato, SKIN1004), flat lay Anua на льне, Tom Ford Eye Quad на тёмном мраморе, масло Gisou в интерьере, Nacific на травертине.", "cover_idx": 0, "items": [{"label": "Splash-shot: SKIN1004 Centella сыворотка — тёмный фон, золото", "src": "assets/dcb1e320b053.jpg", "type": "photo"}, {"label": "Splash-shot: Likato сыворотка в воде — розовый фон", "src": "assets/3d833187c3ca.jpg", "type": "photo"}, {"label": "Flat lay: Anua набор, серый лён", "src": "assets/6cf17bb725dd.jpg", "type": "photo"}, {"label": "Flat lay: Tom Ford Eye Quad — палетка теней на мраморе", "src": "assets/2d3d70b93052.jpg", "type": "photo"}, {"label": "Nacific Pink набор на травертине", "src": "assets/399ff19eb9a4.jpg", "type": "photo"}]}, "beauty_macro": {"title": "Beauty — Макро текстура кожи", "niche": "beauty", "type": "photo", "desc": "Экстремальное макро: нанесение крема на кожу с видимыми порами и пушком. Задача — показать реалистичную текстуру без airbrush-эффекта, что создаёт доверие у аудитории.", "cover_idx": 0, "items": [{"label": "Макро: крем на коже — видны поры, пушок, текстура", "src": "data:dup,0", "type": "photo"}]}, "beauty_beforeafter": {"title": "Beauty — До/После", "niche": "beauty", "type": "photo", "desc": "Серия до/после для косметических брендов: тушь для ресниц (ДО/ПОСЛЕ), ретушь кожи с акне, сияние после сыворотки, тинт для губ. Демонстрация результата продукта.", "cover_idx": 0, "items": [{"label": "До/после: тушь для ресниц — ДО/ПОСЛЕ", "src": "assets/8512a81ddd72.jpg", "type": "photo"}, {"label": "До/после: тинт для губ и щёк — корейская косметика", "src": "assets/8b583a4b90b5.jpg", "type": "photo"}, {"label": "До/после: акне — очищение кожи", "src": "assets/cfe0181f737e.jpg", "type": "photo"}, {"label": "До/после: сыворотка — сияние кожи", "src": "assets/8fa3ad2742d4.jpg", "type": "photo"}, {"label": "До/после: борьба с акне — очищение кожи", "src": "assets/3e73d5e5e895.jpg", "type": "photo"}]}, "beauty_video_skincare": {"title": "Beauty Video — Luxury Skincare 15s", "niche": "beauty", "type": "video", "desc": "15-секундный рекламный ролик уходовой косметики: плавные переходы, тёплый свет, текстуры крема. Формат для Instagram Reels / TikTok.", "cover_idx": 0, "items": [{"label": "Beauty Video — Luxury Skincare 15s", "src": "assets/276ee0f04598.mp4", "type": "video"}]}, "beauty_video_macro": {"title": "Beauty Video — Macro Slow Motion", "niche": "beauty", "type": "video", "desc": "Экстремальное макро в замедленной съёмке: нанесение сыворотки на кожу, текстура и впитывание в деталях. Editorial-формат для luxury-beauty брендов.", "cover_idx": 0, "items": [{"label": "Beauty Video — Macro Slow Motion", "src": "assets/5bcd7e5a5f69.mp4", "type": "video"}]}};
+GROUPS["heraldry"]={"title": "Геральдика — герб на носителях", "niche": "photo", "type": "photo", "desc": "Демонстрация фамильного герба на разных носителях в люксовой цветовой гамме. 6 форматов: музейная витрина, интерьерный постер, перстень-печатка, кружка, кожаный ежедневник. Задача — показать, как герб работает в реальном пространстве.", "cover_idx": 0, "items": [{"label": "Витрина — музейный свет", "src": "assets/fb0e690fb883.jpg", "type": "photo"}, {"label": "Интерьер — терракот, дерево", "src": "assets/ae8f99c89deb.jpg", "type": "photo"}, {"label": "Стена — оливковый фон", "src": "assets/af8ffe55e31d.jpg", "type": "photo"}, {"label": "Кожаный ежедневник — тиснение герба, перо и чернильница", "src": "assets/66b4dee3d2f7.jpg", "type": "photo"}, {"label": "Фарфоровая кружка", "src": "assets/37a25a50e7ec.jpg", "type": "photo"}, {"label": "Перстень-печатка — гравировка герба, золото с эмалью", "src": "assets/64af3f807da4.jpg", "type": "photo"}]};
+GROUPS["food_video"]={"title": "Food Video — Квашеная капуста", "niche": "food", "type": "video", "desc": "Тест работы с едой: девушка в современном интерьере берёт квашеную капусту вилкой и кладёт на тарелку. Три сцены — общий план, крупный план, сервировка. Демонстрирует умение работать с текстурой и движением еды.", "cover_idx": 0, "items": [{"label": "Food — сцена 1", "src": "assets/4a5819aec5d4.mp4", "type": "video"}, {"label": "Food — сцена 2", "src": "assets/5d12baea2075.mp4", "type": "video"}, {"label": "Food — сцена 3", "src": "assets/98dff3f01129.mp4", "type": "video"}]};
+
+GROUPS["fashion_skirt_card"]={"title": "Мода — Фото: карточка товара и лукбук", "niche": "fashion", "type": "photo", "cover_idx": 0, "desc": "Фото в нише одежды: карточка товара для маркетплейса — юбка (силуэт, посадка, крой, складки), outdoor lifestyle (пальто, парк, осень), studio full-body (оверсайз-костюм, белый фон), street style (шёлковое платье, золотой закат). Задача — передать посадку, фактуру ткани, сценарий использования.", "items": [{"label": "Главное фото — силуэт, высокая талия", "src": "assets/163583d939ab.jpg", "type": "photo"}, {"label": "Фото — движение, лёгкая локация", "src": "assets/3232f6128a84.jpg", "type": "photo"}, {"label": "Фото — деталь кроя, складки крупно", "src": "assets/f28994a12b73.jpg", "type": "photo"}, {"label": "Фото — полный образ, нейтральный фон", "src": "assets/4fb9e34bc78a.jpg", "type": "photo"}, {"label": "Outdoor lifestyle — пальто, парк, осень", "src": "assets/28f955c3cb7b.jpg", "type": "photo"}, {"label": "Studio full-body — оверсайз-костюм, белый фон", "src": "assets/d665092d302b.jpg", "type": "photo"}, {"label": "Street style — шёлковое платье, закат", "src": "assets/cae677b940de.jpg", "type": "photo"}]};
+GROUPS["fashion_lookbook"]={"title": "Мода — Видео: движение ткани, cinematic, viral", "niche": "fashion", "type": "video", "cover_idx": 0, "desc": "Видео в нише одежды: движение юбки при ходьбе, детали кроя крупным планом, cinematic проходка с физикой ткани, viral slow-motion 9:16, динамичные social-media ролики для Reels/TikTok.", "items": [{"label": "Видео — движение ткани, ходьба", "src": "assets/6290002d5d00.mp4", "type": "video"}, {"label": "Видео — детали кроя, крупный план", "src": "assets/d76a940faa5c.mp4", "type": "video"}, {"label": "Close-up: детали ткани, швы, фурнитура", "src": "assets/8a6a5bc08efd.mp4", "type": "video"}, {"label": "Cinematic: проходка, физика ткани", "src": "assets/7d0d72e5cbe2.mp4", "type": "video"}, {"label": "Street walk: динамика, движение", "src": "assets/ad5575d2ecf2.mp4", "type": "video"}, {"label": "Cinematic slow-motion 9:16 — шёлк, золотой свет", "src": "assets/423b0ceb2347.mp4", "type": "video"}, {"label": "10s viral social media — динамика, монтаж", "src": "data:dup,1", "type": "video"}, {"label": "Continuous viral — street, движение ткани", "src": "data:dup,2", "type": "video"}, {"label": "High-fashion walk — физика материала", "src": "data:dup,3", "type": "video"}, {"label": "10s viral — динамика, смена кадров", "src": "data:dup,1", "type": "video"}, {"label": "Continuous viral — street walk, движение", "src": "data:dup,2", "type": "video"}, {"label": "High-fashion walk — физика материала", "src": "data:dup,3", "type": "video"}]};
+GROUPS["fashion_video"]={"title": "Мода — Видео: движение ткани и кинематографика", "niche": "fashion", "type": "video", "cover_idx": 0, "desc": "Три fashion-видео: close-up деталей ткани (швы, фурнитура, текстура), cinematic проходка с реалистичной физикой ткани, динамичный street-style walk. Задача — показать, как одежда живёт в движении, как ведёт себя материал.", "items": []};
+GROUPS["jewelry_hires"]={"title": "Ювелирка — Фото: макро украшений", "niche": "fashion", "type": "photo", "cover_idx": 0, "desc": "Ювелирная съёмка: браслет-гвоздь на руке (мрамор, золото), колье с изумрудом на модели, extreme macro кольцо с бриллиантом (огранка emerald), рубин в золотой оправе на коже. Ключевая задача — передать качество металла, огранку камня, посадку изделия.", "items": [{"label": "Macro: браслет-гвоздь на руке, мрамор", "src": "assets/614e17f2049b.jpg", "type": "photo"}, {"label": "Editorial: колье с изумрудом на модели", "src": "assets/b7330b8c1949.jpg", "type": "photo"}, {"label": "Extreme macro: кольцо с бриллиантом, огранка", "src": "assets/967ce6d99410.jpg", "type": "photo"}, {"label": "Extreme macro — рубин, золото, кожа", "src": "assets/e23ec4f05049.jpg", "type": "photo"}]};
+GROUPS["jewelry_video"]={"title": "Ювелирка — Видео: luxury product shot", "niche": "fashion", "type": "video", "cover_idx": 0, "desc": "Luxury видео ювелирного продукта: медленное вращение украшения, игра бликов на металле и преломление в камне. Кинематографический свет, тёмный фон.", "items": [{"label": "Luxury product video — блики, металл, камень", "src": "assets/43b2759d72c8.mp4", "type": "video"}, {"label": "Luxury видео — вращение, блики металла и камня", "src": "assets/1ac98b3542a5.mp4", "type": "video"}]};
+
+GROUPS["tech_gadgets"]={"title": "Техника — Гаджеты и электроника", "niche": "photo", "type": "photo", "cover_idx": 0, "desc": "Три формата tech-съёмки: splash-shot смарт-часов (демонстрация водозащиты, брызги воды, энергия), creative tech — игровые наушники SVEN в неоновом дыму (агрессивный gaming-стиль), lifestyle — кофемашина Miele в скандинавской кухне (премиум-интерьер, натуральный свет). Задача — передать характер каждого продукта и сценарий использования.", "items": [{"label": "Смарт-часы в воде — водозащита, splash", "src": "assets/a7de51a3a50e.jpg", "type": "photo"}, {"label": "Наушники SVEN — неон, дым, gaming-стиль", "src": "assets/e4e3e54ea260.jpg", "type": "photo"}, {"label": "Кофемашина Miele — интерьер, lifestyle", "src": "assets/691a765efd08.jpg", "type": "photo"}]};
+GROUPS["fashion_viral_video"]={"title": "Мода — Viral & Cinematic видео", "niche": "fashion", "type": "video", "cover_idx": 0, "desc": "4 вирусных fashion-ролика: cinematic slow-motion 9:16 (шёлковое платье, золотой свет), 10-секундный social-media viral (динамика, монтаж), continuous viral (движение ткани, street), high-fashion walk (физика материала в движении). Все форматы под Reels/TikTok.", "items": []};
+
+GROUPS["mp_pet_toy"]={"title": "Маркетплейс — Карточка товара: игрушка для кошек", "niche": "marketplace", "type": "photo", "cover_idx": 3, "desc": "Полный сет карточки товара для WB/Ozon: игрушка-мышка с мататаби. Все изображения созданы нейросетями — вид товара сохранён точно, тексты и инфографика сгенерированы в нужном стиле. Главное фото (эко-игрушка), инфографика с характеристиками (размер, вес), инструкция по применению, акцент на природный аттрактант + видео «оживающей» карточки для привлечения внимания в ленте.", "items": [{"label": "Главное фото — эко-игрушка, УТП, CTA", "src": "assets/8a3195314685.jpg", "type": "photo"}, {"label": "Инфографика — природный аттрактант, преимущества", "src": "assets/cbdd1f246515.jpg", "type": "photo"}, {"label": "Инфографика — компактный размер 12 см, характеристики", "src": "assets/7c4622c18ba8.jpg", "type": "photo"}, {"label": "Инструкция — как играть, 4 шага", "src": "assets/48d8e6670537.jpg", "type": "photo"}, {"label": "Видео — «оживающая» карточка, движение мышки", "src": "assets/b4c447f2adc1.mp4", "type": "video"}]};
+GROUPS["mp_brow_gel"]={"title": "Маркетплейс — Карточка товара: гель для бровей PUSY", "niche": "marketplace", "type": "photo", "cover_idx": 0, "desc": "Сет из 4 карточек для гель-фиксатора бровей PUSY Super Fix на WB/Ozon. Текст, инфографика и модели — всё создано нейросетями, упаковка передана точно. Главное фото с моделью и продуктом, технические характеристики с выносками, карточка с УТП, до/после — замена ламинированию.", "items": [{"label": "Карточка 1 — главное фото: применение геля, выноски", "src": "assets/63bf2485b512.jpg", "type": "photo"}, {"label": "Карточка 2 — новая текстура, сильная фиксация", "src": "assets/13739234e579.jpg", "type": "photo"}, {"label": "Карточка 3 — гель Super Fix, степень фиксации", "src": "assets/80ea4e2c5e74.jpg", "type": "photo"}, {"label": "Карточка 4 — до/после: замена ламинированию", "src": "assets/e9cd745a1e9e.jpg", "type": "photo"}]};
+GROUPS["mp_underwear"]={"title": "Маркетплейс — Карточка товара: боксёры ТВОЕ", "niche": "marketplace", "type": "photo", "cover_idx": 3, "desc": "Полный сет карточки мужских трусов-боксёров ТВОЕ для WB/Ozon. Нейросети создали модель, сохранив точный вид товара — крой, ткань, резинку, логотип. Инфографика подчёркивает ключевые характеристики: анатомический крой, дышащий хлопок 95%, мягкая резинка, комплект 3 шт.", "items": [{"label": "Главное фото — набор боксёров, идеальная посадка", "src": "assets/ba74377474b3.jpg", "type": "photo"}, {"label": "Инфографика — анатомический крой, свобода движений", "src": "assets/93740e656872.jpg", "type": "photo"}, {"label": "Макро — резинка ТВОЕ, «не давит и не слетает»", "src": "assets/067206332e81.jpg", "type": "photo"}, {"label": "Макро ткани — дышащий хлопок 95%, натуральный состав", "src": "assets/7c549a262c0d.jpg", "type": "photo"}]};
+
+GROUPS["jewelry_extended"]={"title": "Ювелирка — Расширенный кейс: кольца на коже", "niche": "jewelry", "type": "photo", "cover_idx": 0, "desc": "Три macro-кадра ювелирных украшений на коже: рубин в золотой оправе (extreme macro, texture кожи, огранка), два подготовительных referens-кадра с разными ракурсами. Задача — передать посадку кольца, фактуру камня и металла, живую руку как контекст для украшения. Видео — luxury-ролик с вращением и игрой света.", "items": []};
+GROUPS["food_restaurant"]={"title": "Еда — Фото: ресторан, street food, напитки", "niche": "food", "type": "photo", "cover_idx": 0, "desc": "Фуд-фото разных форматов: рамен с паром (японская улица), малиновые тарталетки, пицца с тянущимся сыром, вок на огне, клубника в шоколаде, грейпфрутовый splash, ночной коктейль, poke bowl (overhead), круассан с хрустящими слоями.", "items": [{"label": "Рамен с мисо-бульоном — пар, нори, яйцо аджицукэ, японская улица", "src": "assets/1aaf2dfdc58c.jpg", "type": "photo"}, {"label": "Тарталетки с малиной — сахарная пудра падает, слоёное тесто", "src": "assets/ded0097d9574.jpg", "type": "photo"}, {"label": "Пицца пепперони — тянущийся сыр, дровяная печь, дым", "src": "assets/bfc4931b2cd3.jpg", "type": "photo"}, {"label": "Вок с лапшой и овощами — огонь, ночной азиатский рынок", "src": "assets/10eb70decd8c.jpg", "type": "photo"}, {"label": "Клубника падает в растопленный шоколад — splash, тёмный фон", "src": "assets/86c77344aca9.jpg", "type": "photo"}, {"label": "Грейпфрутовый лимонад со льдом — splash, бирюзовый фон", "src": "assets/803e86458122.jpg", "type": "photo"}, {"label": "Коктейль с лаймом и льдом — запотевший стакан, неоновая вывеска", "src": "assets/1cb5af768a13.jpg", "type": "photo"}, {"label": "Poke bowl — лосось, авокадо, эдамаме, рис, вид сверху", "src": "assets/eac3d81b4815.jpg", "type": "photo"}, {"label": "Круассан разламывается — видны хрустящие слои, золотой утренний свет", "src": "assets/136455b87d26.jpg", "type": "photo"}]};
+GROUPS["food_commercial"]={"title": "Еда — Видео: ресторан и коммерческий контент", "niche": "food", "type": "video", "cover_idx": 0, "desc": "Три food-видео: стейк rare в стиле fine dining, ресторанный маффин с атмосферной подачей и UGC-ролик — девушка дома ест консервированный горошек прямо из банки.", "items": [{"label": "Видео: стейк rare — соус, микрозелень, fine dining, тёмный фон", "src": "assets/8004dee1bd12.mp4", "type": "video"}, {"label": "Видео: маффин — ресторанная подача, движение камеры, атмосфера", "src": "assets/2a183beb16c7.mp4", "type": "video"}, {"label": "Видео: девушка дома ест консервированный горошек из банки — UGC, реалистичная сцена", "src": "assets/ce8bc342d6e1.mp4", "type": "video"}]};
+
+GROUPS["neuro_design"]={"title": "Нейродизайн — челлендж Нейробитва", "niche": "marketplace", "type": "photo", "desc": "Серия дизайн-кейсов с челленджа «Нейробитва». Пять задач — пять провокаций: превратить круглое в квадратное, придумать товары для мутантов, оформить обложки для любимых песен, оживить газеты и обыграть неожиданный материал (коньки, смартфон-кодекс). Каждая работа — самостоятельный концепт, упакованный как готовый рекламный артефакт.", "cover_idx": 0, "items": [{"label": "Круглое → квадратное — СТАЗИС — квадратная шина «не катится»", "src": "assets/bcc463576ed6.jpg", "type": "photo", "section": "Круглое → квадратное"}, {"label": "Круглое → квадратное — АБСОЛЮТ — стиральная машина с квадратным барабаном", "src": "assets/21521657b061.jpg", "type": "photo", "section": "Круглое → квадратное"}, {"label": "Круглое → квадратное — ОРТО — постер фильма с квадратным компасом", "src": "assets/ea69d33f4436.jpg", "type": "photo", "section": "Круглое → квадратное"}, {"label": "Товары для мутантов — NEO-NEST™ — мебель с отверстием для хвоста", "src": "assets/24ba6135c041.jpg", "type": "photo", "section": "Товары для мутантов"}, {"label": "Товары для мутантов — AURASOUND — наушники для семьи мутантов", "src": "assets/9023701b728b.jpg", "type": "photo", "section": "Товары для мутантов"}, {"label": "Товары для мутантов — CARDIASYNC — кардио-мониторинг для трёхсердечных", "src": "assets/1b8eb6190e2b.jpg", "type": "photo", "section": "Товары для мутантов"}, {"label": "Товары для мутантов — AMBROSIA — посуда для многоротовых гурманов", "src": "assets/3d6050d84baa.jpg", "type": "photo", "section": "Товары для мутантов"}, {"label": "Обложки для любимых песен — Смешарики — «Круглая песня»", "src": "assets/53f275d1576d.jpg", "type": "photo", "section": "Обложки для любимых песен"}, {"label": "Обложки для любимых песен — Noize MC — «На Марсе классно»", "src": "assets/ed7f5cf0348b.jpg", "type": "photo", "section": "Обложки для любимых песен"}, {"label": "Газеты с оживлением — НЕЙРО-ВЕСТИ — спецвыпуск «Daily Glitch»", "src": "assets/281274bce7d5.jpg", "type": "photo", "section": "Газеты с оживлением"}, {"label": "Газеты с оживлением — ВЕСТНИК СБОЯ — хроники распада реальности", "src": "assets/27b70f59bbf1.jpg", "type": "photo", "section": "Газеты с оживлением"}, {"label": "Неожиданный материал — IGNIS — фигурные коньки из обсидиана и магмы (упаковка)", "src": "assets/116a54142b2b.jpg", "type": "photo", "section": "Неожиданный материал"}, {"label": "Неожиданный материал — IGNIS — те же коньки в действии на льду", "src": "assets/9a1d0f7b5419.jpg", "type": "photo", "section": "Неожиданный материал"}, {"label": "Неожиданный материал — CODEX EX MACHINA — складной смартфон-кодекс из золота и пергамента", "src": "assets/1941fe6a2b88.jpg", "type": "photo", "section": "Неожиданный материал"}]};
+GROUPS["food_healthy"]={"title": "_hidden", "niche": "food", "type": "photo", "cover_idx": 0, "desc": "", "items": []};
+GROUPS["ugc_london"]={"title": "UGC-кейс — съёмка для клиента (iPhone-стиль)", "niche": "avatar", "type": "photo", "cover_idx": 1, "desc": "UGC-съёмка для маркетплейса в стиле «как на iPhone». Товар клиента — оливковый рибед-топ. По типажу-референсу сгенерировала живую, не-глянцевую модель (поры, текстура кожи, без вылизанности), собрала коллаж образа с сохранением товара, очистила локацию от людей и сняла финальную серию: в рост, в шаге, спинка, кропы, детали и атмосферные кадры с кофе и матчей. Товар не искажается по цвету и фасону, реализм важнее красоты.", "items": [{"label": "Исходник — товар клиента (топ)", "src": "assets/c29c3fef874e.webp", "type": "photo"}, {"label": "Сгенерированная модель", "src": "assets/b8781f0f6011.webp", "type": "photo"}, {"label": "Локация — до", "src": "assets/9edc0deaf9a7.webp", "type": "photo"}, {"label": "Локация — после", "src": "assets/a4ba2e0ead69.webp", "type": "photo"}, {"label": "Сгенерированный коллаж образа", "src": "assets/9926281046ce.webp", "type": "photo"}, {"label": "", "src": "assets/0fa092807484.webp", "type": "photo"}, {"label": "", "src": "assets/0dc48db202e4.webp", "type": "photo"}, {"label": "", "src": "assets/d0d043cdbc55.webp", "type": "photo"}, {"label": "", "src": "assets/b6fd399c4c21.webp", "type": "photo"}, {"label": "", "src": "assets/33b59e0d13df.webp", "type": "photo"}, {"label": "", "src": "assets/c213fb5c8a04.webp", "type": "photo"}, {"label": "", "src": "assets/376802d03f89.webp", "type": "photo"}, {"label": "", "src": "assets/6f67725a5274.webp", "type": "photo"}, {"label": "", "src": "assets/af5722d01128.webp", "type": "photo"}, {"label": "", "src": "assets/e69039b6a66f.webp", "type": "photo"}, {"label": "", "src": "assets/fbc6645b500c.webp", "type": "photo"}, {"label": "", "src": "assets/5d8a286b7fe4.webp", "type": "photo"}, {"label": "", "src": "assets/a1adc7bd8237.webp", "type": "photo"}, {"label": "", "src": "assets/1f72d9da3f75.webp", "type": "photo"}]};
+
+
+// Seed beauty + groups
+
+
+// ── Master reset v5 ──────────────────────────────────────────────────────
+(function(){
+  var M = 'katya_master_v5';
+  if (localStorage.getItem(M)) return;
+  // Clear ALL old data
+  for (var k in localStorage) {
+    if (k.startsWith('katya_')) localStorage.removeItem(k);
+  }
+  localStorage.setItem(M, '1');
+})();
+
+(function(){
+  var M = 'katya_master_v4';
+  if (localStorage.getItem(M)) return;
+  ['katya_pf_v3','katya_pf_seed_v1','katya_pf_seed_v2','katya_pf_seed_v3',
+   'katya_pf_seed_v4','katya_pf_seed_v5','katya_pf_seed_v6','katya_pf_seed_v7',
+   'katya_pf_seed_v8','katya_pf_seed_v2'].forEach(function(k){ localStorage.removeItem(k); });
+  localStorage.setItem(M, '1');
+})();
+
+
+// ── UNIFIED SEED v10 ─────────────────────────────────────────────────────
+(function(){
+  var UKEY = 'katya_seed_unified_v10';
+  if (localStorage.getItem(UKEY)) return;
+  var existing = JSON.parse(localStorage.getItem('katya_pf_v3')||'[]');
+  var ids = new Set(existing.map(function(w){ return w.id; }));
+  var cards = [{"id": 2000, "groupKey": "beauty_flatlay"}, {"id": 2001, "groupKey": "beauty_portrait"}, {"id": 2002, "groupKey": "beauty_beforeafter"}, {"id": 2003, "groupKey": "beauty_video_skincare"}, {"id": 2004, "groupKey": "beauty_video_macro"}, {"id": 3000, "groupKey": "fashion_skirt_card"}, {"id": 3001, "groupKey": "fashion_lookbook"}, {"id": 3002, "groupKey": "jewelry_hires"}, {"id": 3003, "groupKey": "jewelry_video"}, {"id": 4000, "groupKey": "tech_gadgets"}, {"id": 4001, "groupKey": "heraldry"}, {"id": 5000, "groupKey": "mp_pet_toy"}, {"id": 5001, "groupKey": "mp_brow_gel"}, {"id": 5002, "groupKey": "mp_underwear"}, {"id": 6000, "groupKey": "food_restaurant"}, {"id": 6001, "groupKey": "food_commercial"}];
+  var toAdd = [];
+  cards.forEach(function(c){
+    if (ids.has(c.id)) return;
+    var g = GROUPS[c.groupKey];
+    if (!g || !g.items || !g.items.length) return;
+    var ci = Math.min(g.cover_idx||0, g.items.length-1);
+    var cover = g.items[ci];
+    if (!cover || !cover.type) return;
+    toAdd.push({
+      id: c.id, title: g.title, niche: g.niche, type: g.type, desc: g.desc,
+      url: cover.type==='video' ? null : cover.src,
+      videoUrl: cover.type==='video' ? cover.src : null,
+      groupKey: c.groupKey, isGroup: true, itemCount: g.items.length
+    });
+  });
+  localStorage.setItem('katya_pf_v3', JSON.stringify(existing.concat(toAdd)));
+  localStorage.setItem(UKEY, '1');
+})();
+
+
+// Niche label for neurodesign + filter map (NL is declared later in script #2)
+window.addEventListener('DOMContentLoaded', function(){
+  if (typeof NL !== 'undefined') NL.neuro = 'Нейродизайн';
+  // Patch group modal niche display so 'neuro' shows nicely
+  const _orig = window.openGrpModal;
+  if (_orig) {
+    window.openGrpModal = function(gk){
+      _orig(gk);
+      const g = GROUPS[gk];
+      if (g && g.niche === 'neuro') {
+        const el = document.getElementById('grpNiche');
+        if (el) el.textContent = 'Нейродизайн';
+      }
+    };
+  }
+  // Re-render so the 'neuro' niche label appears now that NL is patched
+  if (typeof render === 'function') render();
+});
+// === /NEURO DESIGN CASE ===================================================
+
+
+
+
+
+
+
+// ── Group modal ───────────────────────────────────────────────────────────────
+let grpKey = null, grpIdx = 0;
+
+function openGrpModal(gk) {
+  grpKey = gk;
+  grpIdx = 0;
+  const g = GROUPS[gk];
+  document.getElementById('grpNiche').textContent = {jewelry:'Ювелирка',beauty:'Бьюти / косметика',fashion:'Мода',marketplace:'Маркетплейсы',avatar:'Аватары / UGC',corporate:'Корпоратив',video:'Видео'}[g.niche]||g.niche;
+  document.getElementById('grpTitle').textContent = g.title;
+  document.getElementById('grpDesc').textContent = g.desc;
+  // build thumbs
+  const ts = document.getElementById('grpThumbs');
+  ts.innerHTML = '';
+  g.items.forEach((it,i) => {
+    const d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:center;gap:.6rem;cursor:pointer;padding:.4rem .5rem;border-radius:8px;border:0.5px solid transparent;transition:all .15s;';
+    d.dataset.i = i;
+    d.onclick = () => grpSet(i);
+    d.style.cssText = 'width:72px;height:72px;border-radius:8px;overflow:hidden;cursor:pointer;border:2.5px solid transparent;transition:border-color .15s;flex-shrink:0;position:relative;';
+    if(it.type==='video') {
+      d.innerHTML = `<div style="width:100%;height:100%;background:#1a1410;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 16 16" fill="rgba(250,248,244,0.8)"><polygon points="3,1 15,8 3,15"/></svg></div>`;
+    } else {
+      d.innerHTML = `<img src="${it.src.substring(0,30)}_LOAD_${i}" data-src="${it.src}" style="width:100%;height:100%;object-fit:cover;" onload="this.src=this.getAttribute('data-src')" onerror="">`;
+      // Use smaller preview
+      d.querySelector('img').src = it.src;
+    }
+    d.title = it.label;
+    ts.appendChild(d);
+  });
+  grpSet(0);
+  document.getElementById('grpModal').classList.add('open');
+  // hide nav if only 1 item
+  const navBtns = document.querySelectorAll('#grpMainWrap button');
+  navBtns.forEach(b => b.style.display = g.items.length>1?'':'none');
+}
+
+
+// ── Blob URL helper for base64 video ─────────────────────────────────────
+function blobifyVideo(vid, src) {
+  var b64 = src || vid.getAttribute('data-b64src');
+  if (!b64 || !b64.startsWith('data:video')) { if(src) vid.src=src; return; }
+  try {
+    var arr = b64.split(','), mime = arr[0].match(/:(.*?);/)[1];
+    var bstr = atob(arr[1]), bytes = new Uint8Array(bstr.length);
+    for (var i=0; i<bstr.length; i++) bytes[i] = bstr.charCodeAt(i);
+    var blob = new Blob([bytes], {type: mime});
+    if (vid._burl) URL.revokeObjectURL(vid._burl);
+    vid._burl = URL.createObjectURL(blob);
+    vid.src = vid._burl;
+  } catch(e) { vid.src = b64; }
+}
+
+function grpSet(i) {
+  const g = GROUPS[grpKey];
+  grpIdx = (i+g.items.length)%g.items.length;
+  const it = g.items[grpIdx];
+  const img = document.getElementById('grpMainImg');
+  const vid = document.getElementById('grpMainVid');
+  if(it.type==='video') {
+    img.style.display='none'; vid.style.display='block';
+    // Try direct src first (works in most browsers for small-medium videos)
+    if (vid._burl) { URL.revokeObjectURL(vid._burl); vid._burl = null; }
+    vid.src = it.src;
+    vid.load();
+    vid.play().catch(function(e){
+      // Fallback: blob URL
+      blobifyVideo(vid, it.src);
+      vid.load();
+      vid.play().catch(function(){});
+    });
+  } else {
+    vid.style.display='none'; vid.pause&&vid.pause(); img.style.display='block';
+    img.src=it.src;
+  }
+  document.getElementById('grpItemLabel').textContent=it.label;
+  document.getElementById('grpCounter').textContent=`${grpIdx+1} / ${g.items.length}`;
+  // highlight thumb
+  document.querySelectorAll('#grpThumbs > div').forEach((d,idx)=>{
+    d.style.borderColor = idx===grpIdx?'var(--ac)':'transparent';
+  });
+  // Scroll active thumb into view
+  const activeThumb = document.querySelectorAll('#grpThumbs > div')[grpIdx];
+  if(activeThumb) activeThumb.scrollIntoView({behavior:'smooth',block:'nearest',inline:'nearest'});
+  // Show editor for selected item
+  const panel = document.getElementById('grpEditor');
+  if (panel && panel.style.display !== 'none') grpShowEditor();
+}
+function grpNav(dir) { grpSet(grpIdx+dir); }
+function closeGrpModal() {
+  document.getElementById('grpModal').classList.remove('open');
+  const v=document.getElementById('grpMainVid'); if(v) v.pause();
+}
+function maybeCloseGrp(e) { if(e.target===document.getElementById('grpModal')) closeGrpModal(); }
+
+// ── Group Editor ─────────────────────────────────────────────────────────
+
+function grpShowEditor() {
+  const panel = document.getElementById('grpEditor');
+  if (!panel) return;
+  panel.style.display = 'block';
+  const g = GROUPS[grpKey];
+  const it = g.items[grpIdx];
+  document.getElementById('grpEditLabel').value = it ? it.label : '';
+}
+
+function grpSaveLabel() {
+  const g = GROUPS[grpKey];
+  const newLabel = document.getElementById('grpEditLabel').value.trim();
+  if (!newLabel || !g.items[grpIdx]) return;
+  g.items[grpIdx].label = newLabel;
+  grpSaveAndRefresh();
+  document.getElementById('grpItemLabel').textContent = newLabel;
+  // Rebuild thumbs
+  openGrpModal(grpKey);
+  grpSet(grpIdx);
+}
+
+function grpDeleteItem() {
+  if (!confirm('Удалить этот элемент из группы?')) return;
+  const g = GROUPS[grpKey];
+  g.items.splice(grpIdx, 1);
+  if (g.items.length === 0) {
+    closeGrpModal();
+    grpSaveAndRefresh();
+    return;
+  }
+  grpSaveAndRefresh();
+  openGrpModal(grpKey);
+  grpSet(0);
+}
+
+function grpReplaceFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const g = GROUPS[grpKey];
+    if (!g.items[grpIdx]) return;
+    g.items[grpIdx].src = e.target.result;
+    g.items[grpIdx].type = file.type.startsWith('video') ? 'video' : 'photo';
+    grpSaveAndRefresh();
+    openGrpModal(grpKey);
+    grpSet(grpIdx);
+  };
+  reader.readAsDataURL(file);
+}
+
+function grpAddFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const label = document.getElementById('grpNewLabel').value.trim() || file.name;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const g = GROUPS[grpKey];
+    const newItem = {
+      label: label,
+      src: e.target.result,
+      type: file.type.startsWith('video') ? 'video' : 'photo'
+    };
+    g.items.push(newItem);
+    grpSaveAndRefresh();
+    openGrpModal(grpKey);
+    grpSet(g.items.length - 1);
+    document.getElementById('grpNewLabel').value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function grpSaveAndRefresh() {
+  // Save updated GROUPS to localStorage so changes persist in this session
+  try {
+    var saved = JSON.parse(localStorage.getItem('katya_grp_overrides') || '{}');
+    saved[grpKey] = GROUPS[grpKey];
+    localStorage.setItem('katya_grp_overrides', JSON.stringify(saved));
+  } catch(e) {}
+  // Refresh portfolio cards
+  if (typeof render === 'function') render();
+}
+
+// Load group overrides from localStorage on startup
+(function loadGrpOverrides() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('katya_grp_overrides') || '{}');
+    Object.keys(saved).forEach(function(k) {
+      if (GROUPS[k]) GROUPS[k] = saved[k];
+    });
+  } catch(e) {}
+})();
+
+</script>
+
+<!-- REGULAR MODAL -->
+<div class="mov" id="modal" onclick="maybeClose(event)">
+  <div class="mbox" id="mboxEl">
+    <div class="mcb"><button onclick="closeModal()">✕</button></div>
+    <div class="mmw" id="mmed"></div>
+    <div class="mbw">
+      <div class="mn" id="mniche"></div>
+      <div class="mt2" id="mtitle"></div>
+      <div class="md2" id="mdesc"></div>
+      <div class="ctags" id="mtools" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- OLIVIA MODAL -->
+<div class="omov" id="olModal" onclick="maybeCloseOl(event)">
+  <div class="ombox">
+    <div style="display:flex;justify-content:flex-end;padding:.9rem .9rem .3rem;position:sticky;top:0;background:var(--cr);border-radius:20px 20px 0 0;">
+      <button onclick="closeOlModal()" style="width:28px;height:28px;border-radius:50%;border:0.5px solid var(--b2);background:transparent;cursor:pointer;font-size:.85rem;color:var(--md);">✕</button>
+    </div>
+    <div style="padding:0 2rem 2.5rem;">
+      <div style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mt);margin-bottom:.4rem;">Кейс · AI-аватар · UGC-инфлюенсер</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:2.3rem;font-weight:300;line-height:1.1;margin-bottom:.7rem;">Olivia — <em style="font-style:italic;color:var(--ac);">цифровой инфлюенсер</em></h2>
+      <p style="font-size:.86rem;color:var(--md);line-height:1.75;max-width:640px;margin-bottom:2rem;">Реалистичный AI-аватар 22 лет для Instagram и TikTok. Задача — <strong style="color:var(--tx);font-weight:400;">«цифровая искренность»</strong>: не глянцевая пластиковая модель, а живая девчонка, которой доверяет аудитория. В образ умышленно заложены три якоря консистентности — элементы, которые сложнее всего удерживать в ИИ-генерациях. Все три держатся в 7 локациях при разном освещении.</p>
+
+      <div class="om-inner" style="display:grid;grid-template-columns:1fr 320px;gap:2rem;margin-bottom:2rem;">
+        <div>
+          <div style="position:relative;border-radius:14px;overflow:hidden;background:var(--wm);margin-bottom:.8rem;">
+            <img id="olMainImg" src="" style="width:100%;max-height:78vh;object-fit:contain;display:block;background:var(--wm);">
+            <button onclick="olNav(-1)" style="position:absolute;left:.7rem;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;border:0.5px solid var(--b2);background:rgba(250,248,244,0.9);cursor:pointer;font-size:1.1rem;color:var(--md);">‹</button>
+            <button onclick="olNav(1)" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;border:0.5px solid var(--b2);background:rgba(250,248,244,0.9);cursor:pointer;font-size:1.1rem;color:var(--md);">›</button>
+          </div>
+          <div id="olPtitle" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;margin-bottom:.2rem;"></div>
+          <div id="olPdesc" style="font-size:.76rem;color:var(--md);line-height:1.6;margin-bottom:.9rem;"></div>
+          <div id="olThumbs" style="display:flex;gap:.45rem;flex-wrap:wrap;"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1.1rem;">
+          <div style="background:#fff;border:0.5px solid var(--br);border-radius:14px;padding:1.3rem;">
+            <div class="sgt" style="margin-bottom:.8rem;">Якоря консистентности</div>
+            <div style="display:flex;flex-direction:column;gap:.85rem;">
+              <div style="display:flex;gap:.65rem;"><span style="flex-shrink:0;">💍</span><div><div style="font-size:.78rem;font-weight:500;color:var(--tx);margin-bottom:.12rem;">Пирсинг на губе</div><div style="font-size:.71rem;color:var(--md);line-height:1.5;">Серебряное кольцо слева — контроль координат при смене ракурса</div></div></div>
+              <div style="display:flex;gap:.65rem;"><span style="flex-shrink:0;">🔸</span><div><div style="font-size:.78rem;font-weight:500;color:var(--tx);margin-bottom:.12rem;">Анатомические родинки</div><div style="font-size:.71rem;color:var(--md);line-height:1.5;">Над бровью и на ключице — биометрические маркеры лица</div></div></div>
+              <div style="display:flex;gap:.65rem;"><span style="flex-shrink:0;">🌿</span><div><div style="font-size:.78rem;font-weight:500;color:var(--tx);margin-bottom:.12rem;">Тату — ветка оливы</div><div style="font-size:.71rem;color:var(--md);line-height:1.5;">Левое плечо — держится в купальнике, худи, топе и деловом образе</div></div></div>
+            </div>
+          </div>
+          <div style="background:#fff;border:0.5px solid var(--br);border-radius:14px;padding:1.3rem;">
+            <div class="sgt" style="margin-bottom:.7rem;">Возможности</div>
+            <div style="font-size:.76rem;color:var(--md);line-height:1.9;">✓ 16 фото · 7 локаций<br>✓ Lip-sync на русском / английском<br>✓ Talking Head 9:16 для Reels<br>✓ UGC product-review формат<br>✓ Замена реального инфлюенсера</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mt);margin-bottom:1rem;">Датасет — 16 кадров · 7 локаций</div>
+      <div id="olGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const OL=[
+  {t:"Lifestyle \u2014 \u0434\u043e\u043c\u0430",d:"\u0415\u0441\u0442\u0435\u0441\u0442\u0432\u0435\u043d\u043d\u0430\u044f \u043e\u0431\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0430, \u0434\u043d\u0435\u0432\u043d\u043e\u0439 \u0441\u0432\u0435\u0442, \u043c\u044f\u0433\u043a\u0438\u0439 \u043e\u0431\u0440\u0430\u0437.",s:"assets/427d0bd038d5.jpg"},
+  {t:"Street style \u2014 \u0420\u0438\u043c",d:"\u0423\u043b\u0438\u0447\u043d\u044b\u0439 \u0441\u0432\u0435\u0442, \u041a\u043e\u043b\u0438\u0437\u0435\u0439. \u041c\u0430\u0440\u043a\u0435\u0440\u044b \u0441\u0442\u0430\u0431\u0438\u043b\u044c\u043d\u044b \u043f\u0440\u0438 \u0431\u043e\u043a\u043e\u0432\u043e\u043c \u043e\u0441\u0432\u0435\u0449\u0435\u043d\u0438\u0438.",s:"assets/126eb040d23a.jpg"},
+  {t:"Travel \u2014 \u041f\u0430\u0440\u0438\u0436",d:"\u0421\u043e\u043b\u043d\u0435\u0447\u043d\u044b\u0439 \u0434\u0435\u043d\u044c, \u042d\u0439\u0444\u0435\u043b\u0435\u0432\u0430 \u0431\u0430\u0448\u043d\u044f. \u0422\u0430\u0442\u0443 \u0438 \u043f\u0438\u0440\u0441\u0438\u043d\u0433 \u0434\u0435\u0440\u0436\u0430\u0442\u0441\u044f.",s:"assets/65b394d0f7a5.jpg"},
+  {t:"Close-up \u2014 \u043d\u0435\u043e\u043d",d:"\u0416\u0451\u0441\u0442\u043a\u0438\u0439 \u0444\u0438\u043e\u043b\u0435\u0442\u043e\u0432\u044b\u0439 \u0441\u0432\u0435\u0442. \u0421\u0442\u0440\u0435\u0441\u0441-\u0442\u0435\u0441\u0442: \u0432\u0441\u0435 \u043c\u0430\u0440\u043a\u0435\u0440\u044b \u043d\u0430 \u043c\u0435\u0441\u0442\u0435.",s:"assets/6c388f451d7c.jpg"},
+  {t:"Dance \u2014 \u0441\u0442\u0443\u0434\u0438\u044f",d:"\u0421\u043b\u043e\u0436\u043d\u044b\u0439 \u0441\u0432\u0435\u0442, \u0430\u043a\u0442\u0438\u0432\u043d\u0430\u044f \u043f\u043e\u0437\u0430. \u0422\u0430\u0442\u0443 \u043d\u0430 \u043f\u043b\u0435\u0447\u0435 \u0447\u0451\u0442\u043a\u0438\u0439.",s:"assets/ed689df49e28.jpg"},
+  {t:"Business selfie",d:"\u0414\u0435\u043b\u043e\u0432\u043e\u0439 \u043e\u0431\u0440\u0430\u0437, \u043d\u043e\u0443\u0442\u0431\u0443\u043a. \u041f\u0435\u0440\u0441\u043e\u043d\u0430\u0436 \u0443\u043d\u0438\u0432\u0435\u0440\u0441\u0430\u043b\u0435\u043d \u043f\u043e \u043a\u043e\u043d\u0442\u0435\u043a\u0441\u0442\u0443.",s:"assets/0683dc1b45ca.jpg"},
+  {t:"Mirror selfie \u2014 \u0443\u0442\u0440\u043e",d:"iPhone aesthetic, \u043e\u0440\u0433\u0430\u043d\u0438\u0447\u043d\u044b\u0439 UGC-\u0444\u043e\u0440\u043c\u0430\u0442.",s:"assets/8e53ffb10869.jpg"},
+  {t:"\u041f\u043b\u044f\u0436 \u2014 \u043e\u0442\u043a\u0440\u044b\u0442\u044b\u0439 \u043e\u043a\u0435\u0430\u043d",d:"\u041c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u044b\u0439 \u0441\u0442\u0440\u0435\u0441\u0441-\u0442\u0435\u0441\u0442 \u043f\u0440\u0438 \u044f\u0440\u043a\u043e\u043c \u0434\u043d\u0435. \u0412\u0441\u0435 \u0442\u0440\u0438 \u044f\u043a\u043e\u0440\u044f \u0432\u0438\u0434\u043d\u044b.",s:"assets/01bc1b9bbc02.jpg"},
+  {t:"\u041f\u043b\u044f\u0436 \u2014 \u0437\u0430\u043a\u0430\u0442",d:"\u0422\u0451\u043f\u043b\u044b\u0439 \u0431\u043e\u043a\u043e\u0432\u043e\u0439 \u0441\u0432\u0435\u0442. \u041c\u0430\u0440\u043a\u0435\u0440\u044b \u0441\u0442\u0430\u0431\u0438\u043b\u044c\u043d\u044b \u043f\u0440\u0438 \u0437\u043e\u043b\u043e\u0442\u043e\u043c \u0447\u0430\u0441\u0435.",s:"assets/0122073a15cc.jpg"},
+  {t:"Talking head \u2014 \u043d\u0435\u043e\u043d",d:"\u0413\u043e\u0432\u043e\u0440\u044f\u0449\u0430\u044f \u0433\u043e\u043b\u043e\u0432\u0430 \u0434\u043b\u044f Reels/TikTok. \u0413\u043e\u0442\u043e\u0432\u0430 \u043a lip-sync.",s:"assets/295c27c6196d.jpg"},
+  {t:"UGC product shot",d:"\u0414\u0435\u0440\u0436\u0438\u0442 \u043f\u0440\u043e\u0434\u0443\u043a\u0442, \u0443\u043b\u044b\u0431\u0430\u0435\u0442\u0441\u044f. \u0420\u0435\u043a\u043b\u0430\u043c\u043d\u044b\u0439 \u0444\u043e\u0440\u043c\u0430\u0442, \u043a\u0443\u0445\u043d\u044f.",s:"assets/f6ef56e44bf1.jpg"},
+  {t:"Lifestyle caf\u00e9",d:"\u041a\u043e\u0444\u0435, \u0431\u0435\u0436\u0435\u0432\u044b\u0439 \u043f\u0438\u0434\u0436\u0430\u043a. \u0416\u0438\u0432\u043e\u0439 lifestyle-\u043a\u043e\u043d\u0442\u0435\u043a\u0441\u0442.",s:"assets/9cbfaab29185.jpg"},
+  {t:"Studio ref \u2014 \u0444\u0440\u043e\u043d\u0442",d:"\u042d\u0442\u0430\u043b\u043e\u043d\u043d\u044b\u0439 \u043a\u0430\u0434\u0440 \u0434\u0430\u0442\u0430\u0441\u0435\u0442\u0430. \u0412\u0441\u0435 \u043c\u0430\u0440\u043a\u0435\u0440\u044b \u0432 \u043c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u043e\u0439 \u0447\u0451\u0442\u043a\u043e\u0441\u0442\u0438.",s:"assets/b90b6f04502f.jpg"},
+  {t:"Studio ref \u2014 3/4",d:"\u0422\u0430\u0442\u0443 \u0432\u0438\u0434\u0435\u043d \u043f\u043e\u043b\u043d\u043e\u0441\u0442\u044c\u044e. \u0420\u0435\u0444\u0435\u0440\u0435\u043d\u0441 \u0434\u043b\u044f \u0434\u0430\u043b\u044c\u043d\u0435\u0439\u0448\u0435\u0439 \u0433\u0435\u043d\u0435\u0440\u0430\u0446\u0438\u0438.",s:"assets/4877fff0fc56.jpg"},
+  {t:"Studio ref \u2014 \u043f\u0440\u043e\u0444\u0438\u043b\u044c",d:"\u041f\u0438\u0440\u0441\u0438\u043d\u0433 \u0438 \u0440\u043e\u0434\u0438\u043d\u043a\u0430 \u0434\u0435\u0440\u0436\u0430\u0442\u0441\u044f \u043f\u0440\u0438 \u043f\u043e\u0432\u043e\u0440\u043e\u0442\u0435.",s:"assets/00e8ab787054.jpg"},
+  {t:"Studio ref \u2014 full body",d:"\u041f\u043e\u043b\u043d\u044b\u0439 \u0440\u043e\u0441\u0442, \u0444\u0438\u043d\u0430\u043b\u044c\u043d\u044b\u0439 \u043a\u043e\u043d\u0442\u0440\u043e\u043b\u044c\u043d\u044b\u0439 \u043a\u0430\u0434\u0440 \u0434\u0430\u0442\u0430\u0441\u0435\u0442\u0430.",s:"assets/93370a8c91d1.jpg"},
+];
+
+
+// ── Olivia modal ─────────────────────────────────────────────────────────────
+let olIdx = 0;
+
+function buildOlModal() {
+  // Main thumbs
+  const strip = document.getElementById('olThumbs');
+  const grid  = document.getElementById('olGrid');
+  OL.forEach((p, i) => {
+    // thumb strip
+    const t = document.createElement('img');
+    t.src = p.s; t.className = 'ol-t';
+    t.style.cssText = 'width:54px;height:54px;object-fit:cover;border-radius:7px;cursor:pointer;flex-shrink:0;transition:outline .15s;';
+    t.dataset.i = i;
+    t.onclick = () => olSet(i);
+    strip.appendChild(t);
+    // grid
+    const g = document.createElement('div');
+    g.style.cssText = 'overflow:hidden;border-radius:10px;cursor:pointer;aspect-ratio:3/4;';
+    const gi = document.createElement('img');
+    gi.src = p.s; gi.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:top;display:block;';
+    gi.onclick = () => { olSet(i); };
+    g.appendChild(gi); grid.appendChild(g);
+  });
+}
+
+function olSet(i) {
+  olIdx = (i + OL.length) % OL.length;
+  document.getElementById('olMainImg').src = OL[olIdx].s;
+  document.getElementById('olPtitle').textContent = OL[olIdx].t;
+  document.getElementById('olPdesc').textContent = OL[olIdx].d;
+  document.querySelectorAll('.ol-t').forEach((t, idx) => {
+    t.style.outline = idx === olIdx ? '2px solid var(--ac)' : 'none';
+  });
+}
+function olNav(dir) { olSet(olIdx + dir); }
+function openOlModal() {
+  document.getElementById('olModal').classList.add('open');
+  olSet(12); // studio front as default
+}
+function closeOlModal() { document.getElementById('olModal').classList.remove('open'); }
+function maybeCloseOl(e) { if (e.target === document.getElementById('olModal')) closeOlModal(); }
+
+// ── Olivia card in portfolio ─────────────────────────────────────────────────
+function injectOliviaCard() {
+  const grid = document.getElementById('pGrid');
+  const card = document.createElement('div');
+  card.className = 'pc';
+  card.dataset.niche = 'avatar';
+  card.dataset.type = 'avatar';
+  card.dataset.olivia = '1';
+  card.innerHTML = `
+    <div class="cm sq">
+      <img src="${OL[12].s}" alt="Olivia" loading="lazy" decoding="async" style="object-position:top;">
+      <span class="cbadge ba">Аватар</span>
+      <span class="cbadge bp" style="left:auto;right:.8rem;">16 фото</span>
+    </div>
+    <div class="cbody">
+      <div class="cn">Аватары / UGC</div>
+      <div class="ct">AI-инфлюенсер Olivia — датасет консистентности</div>
+      <div class="cd">Реалистичный AI-аватар 22 лет. Три якоря удержания — пирсинг, родинки, тату-олива — стабильны в 7 локациях при любом свете. Готова к lip-sync на RU / EN.</div>
+    </div>`;
+  grid.prepend(card);
+}
+
+// ── Portfolio localStorage ───────────────────────────────────────────────────
+const SK = 'katya_pf_v3';
+const NL = {
+  jewelry:'Мода &amp; Ювелирка', beauty:'Бьюти / косметика',
+  fashion:'Мода &amp; Ювелирка', marketplace:'Маркетплейсы',
+  avatar:'Аватары / UGC', corporate:'Фото', photo:'Фото',
+  video:'Видео / Reels', food:'Еда &amp; напитки', neuro:'Нейродизайн'
+};
+const TB = {photo:'bp',video:'bv',avatar:'ba'};
+const TL = {photo:'Фото',video:'Видео',avatar:'Аватар'};
+
+function load() {
+  // Build works directly from GROUPS — no localStorage needed
+  var works = [];
+  var order = [["ugc_london", 7000, "avatar"], ["heraldry", 1001, "photo"], ["food_video", 1003, "food"], ["beauty_flatlay", 2000, "beauty"], ["beauty_portrait", 2001, "beauty"], ["beauty_beforeafter", 2002, "beauty"], ["beauty_video_skincare", 2003, "beauty"], ["beauty_video_macro", 2004, "beauty"], ["fashion_skirt_card", 3000, "fashion"], ["fashion_lookbook", 3001, "fashion"], ["jewelry_hires", 3002, "fashion"], ["jewelry_video", 3003, "fashion"], ["tech_gadgets", 4000, "photo"], ["mp_pet_toy", 5000, "marketplace"], ["mp_brow_gel", 5001, "marketplace"], ["mp_underwear", 5002, "marketplace"], ["food_restaurant", 6000, "food"], ["food_commercial", 6001, "food"], ["neuro_design", 5003, "marketplace"]];
+  
+  // Add bot promo video (single non-group card)
+  var botVideoSrc = "assets/5c67e4584a36.mp4";
+  if (botVideoSrc) {
+    // Регистрируем бота как одиночную ГРУППУ — открывается через надёжную grpModal
+    GROUPS["bot_promo"] = {
+      niche: 'video',
+      title: 'Reels — промо-видео для бота улучшения фото',
+      desc: 'Вертикальный рекламный ролик для Telegram-бота. Формат 9:16, TikTok/Reels.',
+      cover_idx: 0,
+      items: [{ type: 'video', src: botVideoSrc, label: 'Промо-ролик бота' }]
+    };
+    works.unshift({
+      id: 1002,
+      title: 'Reels — промо-видео для бота улучшения фото',
+      niche: 'video', type: 'video',
+      desc: 'Вертикальный рекламный ролик для Telegram-бота. Формат 9:16, TikTok/Reels.',
+      url: null, videoUrl: botVideoSrc,
+      groupKey: 'bot_promo', isGroup: true, itemCount: 1
+    });
+  }
+  
+  order.forEach(function(item) {
+    var gk = item[0], id = item[1], niche = item[2];
+    var g = GROUPS[gk];
+    if (!g || !g.items || !g.items.length) return;
+    var ci = Math.min(g.cover_idx || 0, g.items.length - 1);
+    var cover = g.items[ci];
+    if (!cover || !cover.type) return;
+    works.push({
+      id: id,
+      title: g.title,
+      niche: niche,
+      type: g.type || cover.type,
+      desc: g.desc || '',
+      url: cover.type === 'video' ? null : cover.src,
+      videoUrl: cover.type === 'video' ? cover.src : null,
+      groupKey: gk,
+      isGroup: true,
+      itemCount: g.items.length
+    });
+  });
+  return works;
+}
+function save(d) { localStorage.setItem(SK, JSON.stringify(d)); }
+
+let af = 'all';
+window.__openById = function(id){
+  var list = load();
+  var w = list.find(function(x){ return String(x.id) === String(id); });
+  if (w && typeof openModal === 'function') openModal(w);
+};
+
+function render() {
+  const grid = document.getElementById('pGrid');
+  const empty = document.getElementById('emptyState');
+  const works = load();
+  const filtered = af === 'all' ? works : works.filter(w => w.niche === af || w.type === af);
+
+  // Remove old dynamic cards (keep olivia)
+  grid.querySelectorAll('.pc:not([data-olivia])').forEach(c => c.remove());
+
+  // Show/hide olivia
+  const olCard = grid.querySelector('[data-olivia]');
+  if (olCard) olCard.style.display = (af === 'all' || af === 'avatar') ? '' : 'none';
+
+  if (!filtered.length && (!olCard || olCard.style.display === 'none')) {
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+  }
+
+  filtered.forEach((w) => {
+    const card = document.createElement('div');
+    // Group cards get special treatment
+    if(w.isGroup && w.groupKey && GROUPS[w.groupKey]) {
+      const g = GROUPS[w.groupKey];
+      if(!g.items||!g.items.length) { grid.appendChild(card); return; }
+      const cover = g.items[Math.min(g.cover_idx||0, g.items.length-1)];
+      if(!cover||!cover.type) { grid.appendChild(card); return; }
+      const isVid = cover.type==='video';
+      const ratio = isVid ? 'land' : (g.items.length>2 ? 'sq' : 'port');
+      const bc = isVid ? 'bv' : 'bp';
+      const bl = isVid ? 'Видео' : 'Фото';
+      card.className = 'pc';
+      card.setAttribute('data-groupkey', w.groupKey);
+      card.innerHTML = `
+        <div class="cm ${ratio}" style="position:relative;">
+          ${isVid
+            ? `<video src="${cover.src}" poster="${(typeof cover.src==='string'&&cover.src.indexOf('assets/')===0)?cover.src.replace('assets/','assets/posters/').replace(/\.mp4$/,'.jpg'):''}" muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;background:#1a1410;"></video><div class="cplay"><div class="cpbtn"><svg viewBox="0 0 16 16"><polygon points="3,1 15,8 3,15"/></svg></div></div>`
+            : `<img src="${cover.src}" alt="${w.title}" loading="lazy" decoding="async">`}
+          <span class="cbadge ${bc}">${bl}</span>
+          ${w.itemCount>1?`<span class="cbadge bp" style="left:auto;right:.8rem;">${w.itemCount} работ</span>`:''}
+          <div class="cdel" onclick="delW(event,${w.id})">✕</div>
+        </div>
+        <div class="cbody">
+          <div class="cn">${NL[w.niche]||w.niche}</div>
+          <div class="ct">${w.title}</div>
+          ${w.desc ? `<div class="cd">${w.desc.substring(0,120)}…</div>` : ''}
+        </div>`;
+      card.addEventListener('click', () => openGrpModal(w.groupKey));
+      grid.appendChild(card);
+      return;
+    }
+    card.className = 'pc';
+    card.setAttribute('data-workid', w.id);
+    const ratio = w.type === 'avatar' ? 'port' : (w.type === 'video' ? 'land' : 'sq');
+    const bc = TB[w.type] || '';
+    const bl = TL[w.type] || w.type;
+    let med = w.url || w.videoUrl
+      ? (w.type === 'video' || w.videoUrl
+          ? `<video src="${w.videoUrl||w.url}" poster="${(function(u){return (typeof u==='string'&&u.indexOf('assets/')===0)?u.replace('assets/','assets/posters/').replace(/\.mp4$/,'.jpg'):'';})(w.videoUrl||w.url)}" muted loop playsinline preload="none"></video><div class="cplay"><div class="cpbtn"><svg viewBox="0 0 16 16"><polygon points="3,1 15,8 3,15"/></svg></div></div>`
+          : `<img src="${w.url}" alt="${w.title}" loading="lazy" decoding="async">`)
+      : `<div class="ph">без медиа</div>`;
+    const tools = (w.tools||'').split(',').filter(Boolean).map(t => `<span class="tg">${t.trim()}</span>`).join('');
+    card.innerHTML = `
+      <div class="cm ${ratio}">${med}<span class="cbadge ${bc}">${bl}</span><div class="cdel" onclick="delW(event,${w.id})">✕</div></div>
+      <div class="cbody">
+        <div class="cn">${NL[w.niche]||w.niche}</div>
+        <div class="ct">${w.title}</div>
+        ${w.desc ? `<div class="cd">${w.desc}</div>` : ''}
+        ${tools ? `<div class="ctags">${tools}</div>` : ''}
+      </div>`;
+    card.addEventListener('click', () => openModal(w));
+    grid.appendChild(card);
+  });
+
+  grid.querySelectorAll('.pc video').forEach(v => {
+    v.closest('.pc').addEventListener('mouseenter', () => v.play());
+    v.closest('.pc').addEventListener('mouseleave', () => { v.pause(); v.currentTime = 0; });
+  });
+}
+
+// ── Filter ───────────────────────────────────────────────────────────────────
+document.querySelectorAll('.fb').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.fb').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    af = b.dataset.f;
+    render();
+  });
+});
+
+// ── File upload ──────────────────────────────────────────────────────────────
+let pendUrl = null;
+const dz = document.getElementById('dz');
+const fi = document.getElementById('fi-file');
+const ps = document.getElementById('pstrip');
+dz.addEventListener('click', () => fi.click());
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+fi.addEventListener('change', () => { if (fi.files[0]) handleFile(fi.files[0]); });
+
+function handleFile(f) {
+  const isV = f.type.startsWith('video/');
+  const r = new FileReader();
+  r.onload = e => {
+    pendUrl = e.target.result;
+    ps.innerHTML = '';
+    const t = document.createElement('div');
+    t.className = 'pthumb';
+    t.innerHTML = isV ? `<video src="${pendUrl}" muted></video><div class="rm" onclick="clearF()">✕</div>` : `<img src="${pendUrl}"><div class="rm" onclick="clearF()">✕</div>`;
+    ps.appendChild(t);
+    if (isV) document.getElementById('fi-type').value = 'video';
+  };
+  r.readAsDataURL(f);
+}
+function clearF() { pendUrl = null; ps.innerHTML = ''; fi.value = ''; }
+
+function addWork() {
+  const title = document.getElementById('fi-title').value.trim();
+  if (!title) { showToast('Введите название'); return; }
+  const w = { id: Date.now(), title, niche: document.getElementById('fi-niche').value, type: document.getElementById('fi-type').value, tools: document.getElementById('fi-tools').value, desc: document.getElementById('fi-desc').value.trim(), url: pendUrl || null };
+  const list = load(); list.unshift(w); save(list); render();
+  document.getElementById('fi-title').value = '';
+  document.getElementById('fi-tools').value = '';
+  document.getElementById('fi-desc').value = '';
+  clearF();
+  showToast('✓ Работа добавлена');
+  document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
+}
+
+function delW(e, id) {
+  e.stopPropagation();
+  if (!confirm('Удалить работу?')) return;
+  save(load().filter(w => w.id !== id)); render();
+  showToast('Удалено');
+}
+
+// ── Regular modal ─────────────────────────────────────────────────────────────
+function openModal(w) {
+  document.getElementById('mniche').textContent = NL[w.niche] || w.niche;
+  document.getElementById('mtitle').textContent = w.title;
+  document.getElementById('mdesc').textContent = w.desc || '';
+  document.getElementById('mtools').innerHTML = (w.tools||'').split(',').filter(Boolean).map(t => `<span class="tg">${t.trim()}</span>`).join('');
+  const mm = document.getElementById('mmed');
+  const _mSrc = w.url || w.videoUrl;
+  if (_mSrc) {
+    mm.style.display = 'block';
+    const _isVid = w.type==='video' || !!w.videoUrl;
+    const _el = document.createElement(_isVid ? 'video' : 'img');
+    if (_isVid) {
+      _el.controls = true; _el.muted = false; _el.playsInline = true; _el.setAttribute('playsinline',''); _el.setAttribute('webkit-playsinline','');
+      _el.setAttribute('controlsList','nodownload');
+      _el.oncontextmenu = function(){ return false; };
+      _el.style.cssText = 'width:100%;max-height:70vh;background:#000;display:block;';
+      _el.src = _mSrc;
+      _el.load();
+      _el.play().catch(function(e){
+        blobifyVideo(_el, _mSrc);
+        _el.load();
+        _el.play().catch(function(){});
+      });
+    } else {
+      _el.src = _mSrc; _el.alt = w.title || '';
+      _el.style.cssText = 'width:100%;display:block;';
+    }
+    mm.innerHTML = '';
+    mm.appendChild(_el);
+  } else mm.style.display = 'none';
+  document.getElementById('modal').classList.add('open');
+}
+function maybeClose(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  const v = document.querySelector('#mmed video'); if (v) v.pause();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+const DUPDATA=["assets/7a68da1d4e5f.jpg", "assets/12b720247d7b.mp4", "assets/5d1bb12d4327.mp4", "assets/bcc68cacfdc7.mp4"];
+(function resolveDups(){
+  if(typeof DUPDATA==='undefined')return;
+  function fix(s){return (typeof s==='string'&&s.indexOf('data:dup,')===0)?DUPDATA[+s.slice(9)]:s;}
+  try{Object.keys(GROUPS).forEach(function(k){var g=GROUPS[k];if(g&&g.items)g.items.forEach(function(it){if(it&&it.src)it.src=fix(it.src);});});}catch(e){}
+  try{if(typeof OL!=='undefined')OL.forEach(function(p){if(p&&p.s)p.s=fix(p.s);});}catch(e){}
+})();
+buildOlModal();
+injectOliviaCard();
+render();
+
+// ── BULLETPROOF: event delegation on grid (works regardless of how cards rebuilt) ──
+(function(){
+  var grid = document.getElementById('pGrid');
+  if (!grid) return;
+  grid.addEventListener('click', function(e){
+    var delBtn = e.target.closest('.cdel');
+    if (delBtn) return; // delete handled separately
+    var card = e.target.closest('.pc');
+    if (!card || !grid.contains(card)) return;
+    // Olivia card
+    if (card.hasAttribute('data-olivia')) {
+      if (typeof openOlModal === 'function') { openOlModal(); return; }
+    }
+    var gk = card.getAttribute('data-groupkey');
+    var wid = card.getAttribute('data-workid');
+    if (gk && typeof openGrpModal === 'function' && GROUPS[gk]) {
+      openGrpModal(gk);
+    } else if (wid && typeof window.__openById === 'function') {
+      window.__openById(wid);
+    }
+  }, true);
+})();
+</script>
+
+<script>
+// ── Viewer protection ─────────────────────────────────────────────────────
+document.addEventListener('contextmenu', function(e){
+  if(e.target.tagName==='IMG'||e.target.tagName==='VIDEO'){
+    e.preventDefault(); return false;
+  }
+});
+document.addEventListener('dragstart', function(e){
+  if(e.target.tagName==='IMG'||e.target.tagName==='VIDEO'){
+    e.preventDefault(); return false;
+  }
+});
+// Disable video download button
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('video').forEach(function(v){
+    v.setAttribute('controlsList','nodownload');
+    v.oncontextmenu = function(){return false;};
+  });
+});
+// Observer for dynamically added videos
+const vidObs = new MutationObserver(function(mutations){
+  mutations.forEach(function(m){
+    m.addedNodes.forEach(function(n){
+      if(n.tagName==='VIDEO'||n.querySelector){
+        const vids = n.tagName==='VIDEO'?[n]:(n.querySelectorAll?n.querySelectorAll('video'):[]);
+        vids.forEach(function(v){
+          v.setAttribute('controlsList','nodownload');
+          v.oncontextmenu=function(){return false;};
+        });
+      }
+    });
+  });
+});
+vidObs.observe(document.body, {childList:true, subtree:true});
+</script>
+
+
+<script>
+document.addEventListener('contextmenu', function(e){
+  if(e.target.tagName==='IMG'||e.target.tagName==='VIDEO'){
+    e.preventDefault(); return false;
+  }
+});
+document.addEventListener('dragstart', function(e){
+  if(e.target.tagName==='IMG'||e.target.tagName==='VIDEO'){
+    e.preventDefault(); return false;
+  }
+});
+// Apply nodownload to all videos dynamically
+const _vObs = new MutationObserver(function(ms){
+  ms.forEach(function(m){ m.addedNodes.forEach(function(n){
+    const vs = n.tagName==='VIDEO'?[n]:(n.querySelectorAll?n.querySelectorAll('video'):[]);
+    vs.forEach(function(v){
+      v.setAttribute('controlsList','nodownload');
+      v.oncontextmenu = function(){return false;};
+    });
+  });});
+});
+document.addEventListener('DOMContentLoaded', function(){
+  _vObs.observe(document.body, {childList:true, subtree:true});
+  document.querySelectorAll('video').forEach(function(v){
+    v.setAttribute('controlsList','nodownload');
+    v.oncontextmenu = function(){return false;};
+  });
+});
+</script>
+
+</body>
+</html>
